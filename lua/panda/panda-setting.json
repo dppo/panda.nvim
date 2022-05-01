@@ -1,0 +1,802 @@
+{
+    "win_width": 31,
+    "buf_name": "PandaTree",
+    "indent_symbol": " ",
+    "folder_name_space": " ",
+    "space": " ",
+    "root_name": " [ROOT] ",
+    "close_auto_fold": true,
+    "color_scheme_prefix": "PandaTree",
+    "icon": {
+        "root": {
+            "symbol": "",
+            "color": "#d19a66"
+        },
+        "folder": {
+            "symbol": "",
+            "color": "#61afef"
+        },
+        "folder_open": {
+            "symbol": "",
+            "color": "#61afef"
+        },
+        "folder_node_modules": {
+            "symbol": "",
+            "color": "#61afef"
+        },
+        "folder_node_modules_open": {
+            "symbol": "",
+            "color": "#61afef"
+        },
+        "default": {
+            "symbol": "",
+            "color": "#abb2bf"
+        },
+        "gruntfile": {
+            "symbol": "",
+            "color": "#e37933"
+        },
+        "gulpfile": {
+            "symbol": "",
+            "color": "#cc3e44"
+        },
+        "dropbox": {
+            "symbol": "",
+            "color": "#0061FE"
+        },
+        "xls": {
+            "symbol": "",
+            "color": "#207245"
+        },
+        "doc": {
+            "symbol": "",
+            "color": "#185abd"
+        },
+        "ppt": {
+            "symbol": "",
+            "color": "#cb4a32"
+        },
+        "xml": {
+            "symbol": "謹",
+            "color": "#e37933"
+        },
+        "webpack": {
+            "symbol": "ﰩ",
+            "color": "#519aba"
+        },
+        ".settings.json": {
+            "symbol": "",
+            "color": "#854CC7"
+        },
+        "cs": {
+            "symbol": "",
+            "color": "#596706"
+        },
+        "procfile": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "svg": {
+            "symbol": "ﰟ",
+            "color": "#FFB13B"
+        },
+        ".bashprofile": {
+            "symbol": "",
+            "color": "#89e051"
+        },
+        ".bashrc": {
+            "symbol": "",
+            "color": "#89e051"
+        },
+        ".babelrc": {
+            "symbol": "ﬥ",
+            "color": "#cbcb41"
+        },
+        ".ds_store": {
+            "symbol": "",
+            "color": "#41535b"
+        },
+        "git": {
+            "symbol": "",
+            "color": "#F14C28"
+        },
+        ".gitattributes": {
+            "symbol": "",
+            "color": "#41535b"
+        },
+        ".gitconfig": {
+            "symbol": "",
+            "color": "#41535b"
+        },
+        ".gitignore": {
+            "symbol": "",
+            "color": "#41535b"
+        },
+        ".gitlab-ci.yml": {
+            "symbol": "",
+            "color": "#e24329"
+        },
+        ".gvimrc": {
+            "symbol": "",
+            "color": "#019833"
+        },
+        ".npmignore": {
+            "symbol": "",
+            "color": "#E8274B"
+        },
+        ".vimrc": {
+            "symbol": "",
+            "color": "#019833"
+        },
+        ".zshrc": {
+            "symbol": "",
+            "color": "#89e051"
+        },
+        "Dockerfile": {
+            "symbol": "",
+            "color": "#384d54"
+        },
+        "Gemfile$": {
+            "symbol": "",
+            "color": "#701516"
+        },
+        "LICENSE": {
+            "symbol": "",
+            "color": "#d0bf41"
+        },
+        "Vagrantfile$": {
+            "symbol": "",
+            "color": "#1563FF"
+        },
+        "_gvimrc": {
+            "symbol": "",
+            "color": "#019833"
+        },
+        "_vimrc": {
+            "symbol": "",
+            "color": "#019833"
+        },
+        "ai": {
+            "symbol": "",
+            "color": "#cbcb41"
+        },
+        "awk": {
+            "symbol": "",
+            "color": "#4d5a5e"
+        },
+        "bash": {
+            "symbol": "",
+            "color": "#89e051"
+        },
+        "bat": {
+            "symbol": "",
+            "color": "#C1F12E"
+        },
+        "bmp": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "c": {
+            "symbol": "",
+            "color": "#599eff"
+        },
+        "c++": {
+            "symbol": "",
+            "color": "#f34b7d"
+        },
+        "cc": {
+            "symbol": "",
+            "color": "#f34b7d"
+        },
+        "clj": {
+            "symbol": "",
+            "color": "#8dc149"
+        },
+        "cljc": {
+            "symbol": "",
+            "color": "#8dc149"
+        },
+        "cljs": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "cmakelists.txt": {
+            "symbol": "",
+            "color": "#6d8086"
+        },
+        "coffee": {
+            "symbol": "",
+            "color": "#cbcb41"
+        },
+        "conf": {
+            "symbol": "",
+            "color": "#6d8086"
+        },
+        "config.ru": {
+            "symbol": "",
+            "color": "#701516"
+        },
+        "cp": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "cpp": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "csh": {
+            "symbol": "",
+            "color": "#4d5a5e"
+        },
+        "css": {
+            "symbol": "",
+            "color": "#563d7c"
+        },
+        "cxx": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "d": {
+            "symbol": "",
+            "color": "#427819"
+        },
+        "dart": {
+            "symbol": "",
+            "color": "#03589C"
+        },
+        "db": {
+            "symbol": "",
+            "color": "#dad8d8"
+        },
+        "diff": {
+            "symbol": "",
+            "color": "#41535b"
+        },
+        "dockerfile": {
+            "symbol": "",
+            "color": "#384d54"
+        },
+        "dump": {
+            "symbol": "",
+            "color": "#dad8d8"
+        },
+        "edn": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "eex": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "ejs": {
+            "symbol": "",
+            "color": "#cbcb41"
+        },
+        "elm": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "erl": {
+            "symbol": "",
+            "color": "#B83998"
+        },
+        "ex": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "exs": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "f#": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "favicon.ico": {
+            "symbol": "",
+            "color": "#cbcb41"
+        },
+        "fish": {
+            "symbol": "",
+            "color": "#4d5a5e"
+        },
+        "fs": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "fsi": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "fsscript": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "fsx": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "gemspec": {
+            "symbol": "",
+            "color": "#701516"
+        },
+        "gif": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "go": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "h": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "haml": {
+            "symbol": "",
+            "color": "#eaeae1"
+        },
+        "hbs": {
+            "symbol": "",
+            "color": "#f0772b"
+        },
+        "hh": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "hpp": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "hrl": {
+            "symbol": "",
+            "color": "#B83998"
+        },
+        "hs": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "htm": {
+            "symbol": "",
+            "color": "#e34c26"
+        },
+        "html": {
+            "symbol": "",
+            "color": "#e34c26"
+        },
+        "hxx": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "ico": {
+            "symbol": "",
+            "color": "#cbcb41"
+        },
+        "ini": {
+            "symbol": "",
+            "color": "#6d8086"
+        },
+        "java": {
+            "symbol": "",
+            "color": "#cc3e44"
+        },
+        "jl": {
+            "symbol": "",
+            "color": "#a270ba"
+        },
+        "jpeg": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "jpg": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "js": {
+            "symbol": "",
+            "color": "#cbcb41"
+        },
+        "json": {
+            "symbol": "",
+            "color": "#cbcb41"
+        },
+        "jsx": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "ksh": {
+            "symbol": "",
+            "color": "#4d5a5e"
+        },
+        "leex": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "less": {
+            "symbol": "",
+            "color": "#563d7c"
+        },
+        "lhs": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "license": {
+            "symbol": "",
+            "color": "#cbcb41"
+        },
+        "lua": {
+            "symbol": "",
+            "color": "#51a0cf"
+        },
+        "makefile": {
+            "symbol": "",
+            "color": "#6d8086"
+        },
+        "markdown": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "md": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "mdx": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "mix.lock": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "mjs": {
+            "symbol": "",
+            "color": "#f1e05a"
+        },
+        "ml": {
+            "symbol": "λ",
+            "color": "#e37933"
+        },
+        "mli": {
+            "symbol": "λ",
+            "color": "#e37933"
+        },
+        "mustache": {
+            "symbol": "",
+            "color": "#e37933"
+        },
+        "nix": {
+            "symbol": "",
+            "color": "#7ebae4"
+        },
+        "php": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "pl": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "pm": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "png": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "pp": {
+            "symbol": "",
+            "color": "#302B6D"
+        },
+        "ps1": {
+            "symbol": "",
+            "color": "#4d5a5e"
+        },
+        "psb": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "psd": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "py": {
+            "symbol": "",
+            "color": "#3572A5"
+        },
+        "pyc": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "pyd": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "pyo": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "r": {
+            "symbol": "ﳒ",
+            "color": "#358a5b"
+        },
+        "rake": {
+            "symbol": "",
+            "color": "#701516"
+        },
+        "rakefile": {
+            "symbol": "",
+            "color": "#701516"
+        },
+        "rb": {
+            "symbol": "",
+            "color": "#701516"
+        },
+        "rlib": {
+            "symbol": "",
+            "color": "#dea584"
+        },
+        "rmd": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "rproj": {
+            "symbol": "鉶",
+            "color": "#358a5b"
+        },
+        "rs": {
+            "symbol": "",
+            "color": "#dea584"
+        },
+        "rss": {
+            "symbol": "",
+            "color": "#FB9D3B"
+        },
+        "sass": {
+            "symbol": "",
+            "color": "#f55385"
+        },
+        "scala": {
+            "symbol": "",
+            "color": "#cc3e44"
+        },
+        "scss": {
+            "symbol": "",
+            "color": "#f55385"
+        },
+        "sh": {
+            "symbol": "",
+            "color": "#4d5a5e"
+        },
+        "slim": {
+            "symbol": "",
+            "color": "#e34c26"
+        },
+        "sln": {
+            "symbol": "",
+            "color": "#854CC7"
+        },
+        "sql": {
+            "symbol": "",
+            "color": "#dad8d8"
+        },
+        "styl": {
+            "symbol": "",
+            "color": "#8dc149"
+        },
+        "suo": {
+            "symbol": "",
+            "color": "#854CC7"
+        },
+        "swift": {
+            "symbol": "",
+            "color": "#e37933"
+        },
+        "t": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "tex": {
+            "symbol": "ﭨ",
+            "color": "#3D6117"
+        },
+        "toml": {
+            "symbol": "",
+            "color": "#6d8086"
+        },
+        "ts": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "tsx": {
+            "symbol": "",
+            "color": "#519aba"
+        },
+        "twig": {
+            "symbol": "",
+            "color": "#8dc149"
+        },
+        "vim": {
+            "symbol": "",
+            "color": "#019833"
+        },
+        "vue": {
+            "symbol": "﵂",
+            "color": "#8dc149"
+        },
+        "webmanifest": {
+            "symbol": "",
+            "color": "#f1e05a"
+        },
+        "webp": {
+            "symbol": "",
+            "color": "#a074c4"
+        },
+        "xcplayground": {
+            "symbol": "",
+            "color": "#e37933"
+        },
+        "xul": {
+            "symbol": "",
+            "color": "#e37933"
+        },
+        "yaml": {
+            "symbol": "",
+            "color": "#6d8086"
+        },
+        "yml": {
+            "symbol": "",
+            "color": "#6d8086"
+        },
+        "zsh": {
+            "symbol": "",
+            "color": "#89e051"
+        },
+        "terminal": {
+            "symbol": "",
+            "color": "#31B53E"
+        },
+        "apk": {
+            "symbol": "",
+            "color": "#59C369"
+        },
+        "ipa": {
+            "symbol": "",
+            "color": "#D1D5D6"
+        }
+    },
+    "git": {
+        "enable": true,
+        "command": "git",
+        "icon": {
+            "mixed": "*",
+            "unmodified": " ",
+            "modified": "M",
+            "added": "A",
+            "deleted": "D",
+            "renamed": "R",
+            "copied": "C",
+            "unmerged": "U",
+            "untracked": "?",
+            "ignored": "!"
+        },
+        "map": {
+            " A": [
+                "unmodified",
+                "added"
+            ],
+            " M": [
+                "unmodified",
+                "modified"
+            ],
+            " D": [
+                "unmodified",
+                "deleted"
+            ],
+            "M ": [
+                "unmodified",
+                "modified"
+            ],
+            "MM": [
+                "unmodified",
+                "modified"
+            ],
+            "A ": [
+                "unmodified",
+                "added"
+            ],
+            "AM": [
+                "unmodified",
+                "modified"
+            ],
+            "AD": [
+                "unmodified",
+                "deleted"
+            ],
+            "D ": [
+                "unmodified",
+                "deleted"
+            ],
+            "R ": [
+                "unmodified",
+                "renamed"
+            ],
+            "RM": [
+                "unmodified",
+                "modified"
+            ],
+            "RD": [
+                "unmodified",
+                "deleted"
+            ],
+            "C ": [
+                "unmodified",
+                "copied"
+            ],
+            "CM": [
+                "unmodified",
+                "modified"
+            ],
+            "MD": [
+                "unmodified",
+                "deleted"
+            ],
+            "CD": [
+                "unmodified",
+                "deleted"
+            ],
+            " R": [
+                "unmodified",
+                "renamed"
+            ],
+            "DR": [
+                "unmodified",
+                "renamed"
+            ],
+            " C": [
+                "unmodified",
+                "copied"
+            ],
+            "DC": [
+                "unmodified",
+                "copied"
+            ],
+            "DD": [
+                "unmodified",
+                "unmerged"
+            ],
+            "AU": [
+                "unmodified",
+                "unmerged"
+            ],
+            "UD": [
+                "unmodified",
+                "unmerged"
+            ],
+            "UA": [
+                "unmodified",
+                "unmerged"
+            ],
+            "DU": [
+                "unmodified",
+                "unmerged"
+            ],
+            "AA": [
+                "unmodified",
+                "unmerged"
+            ],
+            "UU": [
+                "unmodified",
+                "unmerged"
+            ],
+            "??": [
+                "unmodified",
+                "untracked"
+            ],
+            "!!": [
+                "unmodified",
+                "ignored"
+            ]
+        }
+    }
+}
