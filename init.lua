@@ -98,6 +98,7 @@ vim.o.termguicolors = true
 vim.cmd "colorscheme onedark"
 
 require("pandaline").setup()
+require("notifyaction").setup()
 
 require "theme".auto_load_color_scheme()
 -- require "panda.pandaline".pandaline_augroup()
