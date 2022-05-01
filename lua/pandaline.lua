@@ -3,7 +3,7 @@ local full_opts = {
   simple_mode = {
     width = 40,
     filetype = {"NvimTree"},
-    ignore_type = {"git", "location"}
+    ignore_type = {"git", "location", "percent", "encoding"}
   },
   git = {
     enable = true,
@@ -12,20 +12,28 @@ local full_opts = {
   },
   theme = {
     PandaLineFill = {
-      bg = "#FF0000",
-      fg = "#FF0000"
-    },
-    PandaLineFile = {
-      bg = "#FF0000",
+      bg = "#282c34",
       fg = "#FFFFFF"
     },
+    PandaLineFile = {
+      bg = "#282c34",
+      fg = "#abb2bf"
+    },
     PandaLineGit = {
-      bg = "#FF0000",
-      fg = "#000000"
+      bg = "#3e4452",
+      fg = "#abb2bf"
     },
     PandaLineLocation = {
-      bg = "#FF0000",
-      fg = "#000000"
+      bg = "#61afef",
+      fg = "#3e4452"
+    },
+    PandaLinePercent = {
+      bg = "#3e4452",
+      fg = "#abb2bf"
+    },
+    PandaLineEncoding = {
+      bg = "#282c34",
+      fg = "#abb2bf"
     }
   },
   mode = {
@@ -85,9 +93,11 @@ local function git_branch()
 end
 
 local function is_simple_mode(win, type_name)
-  local type_index = require("pl.tablex").search(full_opts["simple_mode"]["ignore_type"], type_name)
+  local tablex = require("pl.tablex")
+  local simple_mode = full_opts["simple_mode"]
   local filetype = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(win), "filetype")
-  local search_index = require("pl.tablex").search(full_opts["simple_mode"]["filetype"], filetype)
+  local type_index = tablex.search(simple_mode["ignore_type"], type_name)
+  local search_index = tablex.search(simple_mode["filetype"], filetype)
   return type_index ~= nil and (vim.fn.winwidth(win) <= full_opts["simple_mode"]["width"] or search_index ~= nil)
 end
 
@@ -109,12 +119,28 @@ local function GitBranch(win)
 end
 
 local function CursorLocation(win)
-  local simple_mode = is_simple_mode(win, "git")
+  local simple_mode = is_simple_mode(win, "location")
   if simple_mode then
     return ""
   end
   local status_line = "%l:%c"
   return "%#PandaLineLocation#  " .. status_line .. "  %##"
+end
+
+local function LinePercent(win)
+  local simple_mode = is_simple_mode(win, "percent")
+  if simple_mode then
+    return ""
+  end
+  return "%#PandaLinePercent# %p%% %##"
+end
+
+local function FileEncoding(win)
+  local simple_mode = is_simple_mode(win, "encoding")
+  if simple_mode then
+    return ""
+  end
+  return "%#PandaLineEncoding# %{&fileencoding} %##"
 end
 
 local function load_win_statusline(win, is_cur)
@@ -129,6 +155,8 @@ local function load_win_statusline(win, is_cur)
   status_line = status_line .. SpaceFill()
   -- right
   status_line = status_line .. "%="
+  status_line = status_line .. FileEncoding(win)
+  status_line = status_line .. LinePercent(win)
   status_line = status_line .. CursorLocation(win)
   vim.api.nvim_win_set_option(win, "statusline", status_line)
 end
@@ -209,7 +237,6 @@ end
 local setup = function(opts)
   opts = opts or {}
   tableMerge(full_opts, opts)
-  -- vim.pretty_print(full_opts)
   if full_opts["icon_enable"] == true then
     load_web_icon()
   end
