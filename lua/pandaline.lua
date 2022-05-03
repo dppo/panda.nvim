@@ -1,7 +1,7 @@
 local full_opts = {
   icon_enable = true,
   simple_mode = {
-    width = 40,
+    width = 60,
     filetype = {"NvimTree"},
     ignore_type = {"vimode", "git", "location", "percent", "encoding"}
   },
@@ -255,7 +255,6 @@ local function pandaline_augroup()
   vim.cmd [[autocmd!]]
   vim.cmd [[autocmd BufEnter * lua require"pandaline".load_wins_statusline()]]
   vim.cmd [[autocmd WinEnter * lua require"pandaline".load_wins_statusline()]]
-  vim.cmd [[autocmd User ChooseWinCompleted lua require"pandaline".load_wins_statusline()]]
   vim.cmd [[augroup END]]
 end
 
