@@ -37,6 +37,14 @@ local full_opts = {
     PandaLineEncoding = {
       bg = "#282c34",
       fg = "#abb2bf"
+    },
+    PandaLineChooseWin = {
+      bg = "#61afef",
+      fg = "#3e4452"
+    },
+    PandaLineChooseWinFill = {
+      bg = "#282c34",
+      fg = "#FFFFFF"
     }
   },
   mode = {
@@ -51,8 +59,47 @@ local full_opts = {
     s = {name = "SELECT", bg = "#e5c07b", fg = "#282c34"},
     S = {name = "S-LINE", bg = "#e5c07b", fg = "#282c34"},
     [""] = {name = "S-BLOCK", bg = "#e5c07b", fg = "#282c34"}
-  }
+  },
+  quick_choose = {
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z"
+  },
+  choose_space = "    "
 }
+
+local function current_tab_windows()
+  local tab_wins = {}
+  for _, tab in ipairs(vim.fn.gettabinfo()) do
+    if tab.tabnr == vim.fn.tabpagenr() then
+      tab_wins = tab.windows
+    end
+  end
+  return tab_wins
+end
 
 local function table_find(table, str)
   for k, v in ipairs(table) do
@@ -267,6 +314,40 @@ local function load_web_icon()
   end
 end
 
+local function choose_win_statusline(win, show_item)
+  local mid_space = full_opts["choose_space"]
+  local mid = mid_space .. string.upper(show_item) .. mid_space
+  local width = vim.api.nvim_win_get_width(win)
+  local space = string.rep(" ", math.floor((width - #mid) / 2))
+  local left_fill = "%#PandaLineChooseWinFill#" .. space .. "%##"
+  local right_fill = "%#PandaLineChooseWinFill#" .. space
+  return left_fill .. "%#PandaLineChooseWin#" .. mid .. "%##" .. right_fill
+end
+
+local function choose_win()
+  local used_win_count = 0
+  local wins = current_tab_windows()
+  for k, win in ipairs(wins) do
+    local config = vim.api.nvim_win_get_config(win)
+    if config["relative"] == "" then
+      used_win_count = used_win_count + 1
+      local show_item = full_opts["quick_choose"][k]
+      vim.api.nvim_win_set_option(win, "statusline", choose_win_statusline(win, show_item))
+    end
+  end
+  vim.api.nvim_command("redraw")
+  vim.api.nvim_command("echohl WarningMsg | echo 'choose > ' | echohl None")
+  local c = vim.fn.nr2char(vim.fn.getchar())
+  vim.api.nvim_command("normal :esc<CR>")
+
+  load_wins_statusline()
+
+  local choose_index = table_find(full_opts["quick_choose"], c)
+  if choose_index ~= nil and choose_index ~= vim.fn.winnr() and choose_index <= used_win_count then
+    vim.api.nvim_command("exe " .. choose_index .. " . 'wincmd w'")
+  end
+end
+
 local setup = function(opts)
   tableMerge(full_opts, opts or {})
   if full_opts["icon_enable"] == true then
@@ -279,5 +360,6 @@ end
 return {
   mode_name = mode_name,
   load_wins_statusline = load_wins_statusline,
+  choose_win = choose_win,
   setup = setup
 }

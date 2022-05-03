@@ -315,7 +315,7 @@ cmp.setup(
 
 -- keymap
 vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>w", ":lua require'panda.pandawin'.choose_win()<CR>", {silent = true})
+vim.keymap.set("n", "<leader>w", ":lua require'pandaline'.choose_win()<CR>", {silent = true})
 vim.keymap.set("n", "<leader>cf", ":Format<CR>", {silent = true})
 vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", {silent = true})
 vim.keymap.set("n", "<leader>ss", "<Plug>(easymotion-s2)", {})
