@@ -14,6 +14,9 @@ local full_opts = {
     icon = ""
   },
   theme = {
+    Statusline = {
+      bg = "NONE"
+    },
     PandaLineFill = {
       bg = "#282c34",
       fg = "#FFFFFF"

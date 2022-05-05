@@ -6,7 +6,7 @@ local function load_color_scheme()
   vim.cmd [[hi EndOfBuffer guibg=NONE guifg=#282c34 ctermbg=NONE ctermfg=249]]
 
   -- pandaline
-  vim.cmd [[autocmd ColorScheme * hi Statusline guibg=NONE ctermbg=NONE]]
+  -- vim.cmd [[autocmd ColorScheme * hi Statusline guibg=NONE ctermbg=NONE]]
   vim.cmd [[autocmd ColorScheme * hi PandaLineViMode guifg=#282c34]]
   vim.cmd [[autocmd ColorScheme * hi PandaLineFile guibg=#38393f ctermbg=NONE guifg=#eeeeee ctermfg=15]]
   vim.cmd [[autocmd ColorScheme * hi PandaLineGit guibg=#38393f ctermbg=NONE guifg=#eeeeee ctermfg=15]]
