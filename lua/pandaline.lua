@@ -280,21 +280,6 @@ local function load_pandaline_theme()
   end
 end
 
-local function tableMerge(t1, t2)
-  for k, v in pairs(t2) do
-    if type(v) == "table" then
-      if type(t1[k] or false) == "table" then
-        tableMerge(t1[k] or {}, t2[k] or {})
-      else
-        t1[k] = v
-      end
-    else
-      t1[k] = v
-    end
-  end
-  return t1
-end
-
 local function load_web_icon()
   local web_devicons = require("nvim-web-devicons")
   local has_loaded = web_devicons.has_loaded()
@@ -326,15 +311,13 @@ local function choose_win_statusline(win, show_item)
   return left_fill .. "%#PandaLineChooseWin#" .. mid .. "%##" .. right_fill
 end
 
-local function choose_win()
-  local used_win_count = 0
-  local wins = current_tab_windows()
-  for k, win in ipairs(wins) do
-    local config = vim.api.nvim_win_get_config(win)
-    if config["relative"] == "" then
-      used_win_count = used_win_count + 1
+local function choose_specify_windows(windows)
+  local window_mark = {}
+  for k, window in ipairs(windows) do
+    if vim.api.nvim_win_get_config(window).relative == "" then
       local show_item = full_opts["quick_choose"][k]
-      vim.api.nvim_win_set_option(win, "statusline", choose_win_statusline(win, show_item))
+      window_mark[show_item] = window
+      vim.api.nvim_win_set_option(window, "statusline", choose_win_statusline(window, show_item))
     end
   end
   vim.api.nvim_command("redraw")
@@ -344,14 +327,18 @@ local function choose_win()
 
   load_wins_statusline()
 
-  local choose_index = table_find(full_opts["quick_choose"], c)
-  if choose_index ~= nil and choose_index ~= vim.fn.winnr() and choose_index <= used_win_count then
-    vim.api.nvim_command("exe " .. choose_index .. " . 'wincmd w'")
+  local choose_window = window_mark[c]
+  if choose_window ~= nil then
+    vim.api.nvim_set_current_win(choose_window)
   end
 end
 
+local function choose_win()
+  choose_specify_windows(current_tab_windows())
+end
+
 local setup = function(opts)
-  tableMerge(full_opts, opts or {})
+  full_opts = vim.tbl_deep_extend("force", full_opts, opts or {})
   if full_opts["icon_enable"] == true then
     load_web_icon()
   end
@@ -363,5 +350,6 @@ return {
   mode_name = mode_name,
   load_wins_statusline = load_wins_statusline,
   choose_win = choose_win,
+  choose_specify_windows = choose_specify_windows,
   setup = setup
 }

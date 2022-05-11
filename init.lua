@@ -103,6 +103,7 @@ vim.o.termguicolors = true
 vim.cmd "colorscheme onedark"
 
 require("pandaline").setup()
+-- require("pandatree").setup()
 require("notifyaction").setup()
 
 require "theme".auto_load_color_scheme()
@@ -270,7 +271,8 @@ cmp.setup(
 vim.g.mapleader = " "
 vim.keymap.set("n", "<leader>w", ":lua require'pandaline'.choose_win()<CR>", {silent = true})
 vim.keymap.set("n", "<leader>cf", ":Format<CR>", {silent = true})
-vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", {silent = true})
+vim.keymap.set("n", "<leader>t", ":NvimTreeToggle<CR>", {silent = true})
+vim.keymap.set("n", "<leader>e", ":lua require'pandatree'.togger_tree()<CR>", {silent = true})
 vim.keymap.set("n", "<leader>ss", "<Plug>(easymotion-s2)", {})
 vim.keymap.set("", "<leader>cc", "<Plug>NERDCommenterToggle", {})
 vim.keymap.set("", "<leader>cm", "<Plug>NERDCommenterMinimal", {})
