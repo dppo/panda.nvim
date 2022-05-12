@@ -429,16 +429,6 @@ local function current_tab_tree_window()
   return tree_window
 end
 
-local function current_tab_window()
-  local current_window = nil
-  for _, tab in ipairs(vim.fn.gettabinfo()) do
-    if vim.fn.tabpagenr() == tab.tabnr then
-      current_window = tab.windows[vim.fn.winnr()]
-    end
-  end
-  return current_window
-end
-
 local function get_cursor_row()
   local row = vim.api.nvim_win_get_cursor(0)[1]
   return tmp_data.tree[row]
@@ -486,8 +476,7 @@ local function enter_row()
 end
 
 local function prevent_other_buffers()
-  local current_window = current_tab_window()
-  if verify_is_tree_window(current_window) and vim.fn.bufname("%") ~= full_opts.tree_name then
+  if verify_is_tree_window(vim.api.nvim_get_current_win()) and vim.fn.bufname("%") ~= full_opts.tree_name then
     local buffer = vim.fn.bufnr()
     local tree_buffer = current_tree_buffer()
     if tree_buffer == nil then

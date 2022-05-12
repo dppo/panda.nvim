@@ -2,7 +2,7 @@ local full_opts = {
   icon_enable = true,
   simple_mode = {
     width = 60,
-    filetype = {"NvimTree"},
+    filetype = {"NvimTree", "PandaTree"},
     ignore_type = {"vimode", "git", "location", "percent", "encoding"}
   },
   inactive_mode = {
@@ -95,43 +95,30 @@ local full_opts = {
 }
 
 local function current_tab_windows()
-  local tab_wins = {}
+  local tab_windows = {}
   for _, tab in ipairs(vim.fn.gettabinfo()) do
     if tab.tabnr == vim.fn.tabpagenr() then
-      tab_wins = tab.windows
+      tab_windows = tab.windows
     end
   end
-  return tab_wins
+  return tab_windows
 end
 
-local function table_find(table, str)
-  for k, v in ipairs(table) do
-    if v == str then
-      return k
-    end
-  end
-end
-
-local function is_simple_mode(win, type_name)
-  local simple_mode = full_opts["simple_mode"]
-  local filetype = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(win), "filetype")
-  local type_index = table_find(simple_mode["ignore_type"], type_name)
-  local search_index = table_find(simple_mode["filetype"], filetype)
-  return type_index ~= nil and (vim.fn.winwidth(win) <= full_opts["simple_mode"]["width"] or search_index ~= nil)
+local function is_simple_mode(window, type_name)
+  local filetype = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(window), "filetype")
+  return vim.tbl_contains(full_opts.simple_mode.ignore_type, type_name) and
+    (vim.fn.winwidth(window) <= full_opts.simple_mode.width or
+      vim.tbl_contains(full_opts.simple_mode.filetype, filetype))
 end
 
 local function is_inactive_mode(type_name)
-  local inactive_mode = full_opts["inactive_mode"]
-  local type_index = table_find(inactive_mode["ignore_type"], type_name)
-  return type_index ~= nil
+  return vim.tbl_contains(full_opts.inactive_mode.ignore_type, type_name)
 end
 
 local function mode_name()
-  local mode = vim.fn.mode()
-  local mode_info = full_opts["mode"][mode]
-  local name = mode_info.name
+  local mode_info = full_opts.mode[vim.fn.mode()]
   vim.api.nvim_command("hi PandaLineViMode guibg=" .. mode_info.bg .. " guifg=" .. mode_info.fg)
-  return name
+  return mode_info.name
 end
 
 local function VIMode(is_cur)
@@ -145,14 +132,13 @@ local function SpaceFill()
   return "%#PandaLineFill#"
 end
 
-local function FileInfo(win, is_cur)
+local function FileInfo(window, is_cur)
   if is_cur ~= true and is_inactive_mode("file") then
     return ""
   end
-  local buf = vim.api.nvim_win_get_buf(win)
-  local file_path = vim.api.nvim_buf_get_name(buf)
+  local file_path = vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(window))
   local status_line = ""
-  if full_opts["icon_enable"] == true and file_path ~= nil then
+  if full_opts.icon_enable == true and file_path ~= nil then
     local extension = file_path:match("^.*%.(.*)$") or ""
     local icon = require "nvim-web-devicons".get_icon(file_path, extension)
     if icon ~= nil then
@@ -163,10 +149,8 @@ local function FileInfo(win, is_cur)
 end
 
 local function git_branch()
-  local cwd = vim.loop.cwd()
-  local git_command = "cd " .. cwd .. " && " .. full_opts["git"]["command"] .. " branch --show-current"
-  local branch_info = vim.fn.systemlist(git_command)
-  for _, v in pairs(branch_info) do
+  local git_command = "cd " .. vim.loop.cwd() .. " && " .. full_opts.git.command .. " branch --show-current"
+  for _, v in pairs(vim.fn.systemlist(git_command)) do
     if string.find(v, "fatal: not a git repository") == nil then
       return v
     end
@@ -183,8 +167,8 @@ local function GitBranch(win, is_cur)
     return ""
   end
   local status_line = "%#PandaLineGit#"
-  if full_opts["icon_enable"] == true then
-    local icon = full_opts["git"]["icon"]
+  if full_opts.icon_enable == true then
+    local icon = full_opts.git.icon
     if icon ~= nil then
       status_line = status_line .. " " .. icon
     end
@@ -229,7 +213,7 @@ end
 
 local function load_win_statusline(win, is_cur)
   local status_line = VIMode(is_cur)
-  if full_opts["git"]["enable"] == true then
+  if full_opts.git.enable == true then
     status_line = status_line .. GitBranch(win, is_cur)
   end
   status_line = status_line .. FileInfo(win, is_cur)
@@ -262,19 +246,17 @@ local function pandaline_augroup()
 end
 
 local function load_pandaline_theme()
-  local theme = full_opts["theme"]
+  local theme = full_opts.theme
   for k, v in pairs(theme) do
-    local bg = v["bg"]
-    local fg = v["fg"]
-    if bg == nil and fg == nil then
+    if v.bg == nil and v.fg == nil then
       break
     end
     local color_command = "hi " .. k .. " "
-    if bg ~= nil then
-      color_command = color_command .. "guibg=" .. bg .. " "
+    if v.bg ~= nil then
+      color_command = color_command .. "guibg=" .. v.bg .. " "
     end
-    if fg ~= nil then
-      color_command = color_command .. "guifg=" .. fg
+    if v.fg ~= nil then
+      color_command = color_command .. "guifg=" .. v.fg
     end
     vim.api.nvim_command(color_command)
   end
@@ -287,14 +269,12 @@ local function load_web_icon()
     web_devicons.setup()
   end
   -- change all icon bgcolor
-  local icons = web_devicons.get_icons()
-  for _, icon_data in pairs(icons) do
-    if icon_data.color and icon_data.name then
-      local hl_group = icon_data.name and "PandalineDevIcon" .. icon_data.name
+  for _, icon in pairs(web_devicons.get_icons()) do
+    if icon.color and icon.name then
+      local hl_group = icon.name and "PandalineDevIcon" .. icon.name
       if hl_group then
         vim.api.nvim_command(
-          "highlight! " ..
-            hl_group .. " guifg=" .. icon_data.color .. " guibg=" .. full_opts["theme"]["PandaLineFile"].bg
+          "highlight! " .. hl_group .. " guifg=" .. icon.color .. " guibg=" .. full_opts.theme.PandaLineFile.bg
         )
       end
     end
@@ -302,7 +282,7 @@ local function load_web_icon()
 end
 
 local function choose_win_statusline(win, show_item)
-  local mid_space = full_opts["choose_space"]
+  local mid_space = full_opts.choose_space
   local mid = mid_space .. string.upper(show_item) .. mid_space
   local width = vim.api.nvim_win_get_width(win)
   local space = string.rep(" ", math.floor((width - #mid) / 2))
@@ -315,7 +295,7 @@ local function choose_specify_windows(windows)
   local window_mark = {}
   for k, window in ipairs(windows) do
     if vim.api.nvim_win_get_config(window).relative == "" then
-      local show_item = full_opts["quick_choose"][k]
+      local show_item = full_opts.quick_choose[k]
       window_mark[show_item] = window
       vim.api.nvim_win_set_option(window, "statusline", choose_win_statusline(window, show_item))
     end
@@ -339,7 +319,7 @@ end
 
 local setup = function(opts)
   full_opts = vim.tbl_deep_extend("force", full_opts, opts or {})
-  if full_opts["icon_enable"] == true then
+  if full_opts.icon_enable == true then
     load_web_icon()
   end
   load_pandaline_theme()
