@@ -1,5 +1,6 @@
 local utf = require "lua-utf8"
 local pl_path = require "pl.path"
+local lfs = require "lfs"
 
 local full_opts = {
   icon_enable = true,
@@ -201,7 +202,6 @@ local function sort_by_name(element1, elemnet2)
 end
 
 local function scandir(path, level)
-  local lfs = require "lfs"
   local sort_data = {}
   for dir_obj in lfs.dir(path) do
     if dir_obj ~= "." and dir_obj ~= ".." then
@@ -210,19 +210,19 @@ local function scandir(path, level)
         not tmp_data.showHidden or
           (tmp_data.showHidden and not string.match(pl_path.basename(file_path), full_opts.hidden_reg))
        then
-        local attr = lfs.attributes(file_path)
-        local item = {
-          path = file_path,
-          name = dir_obj,
-          level = level,
-          indent = full_opts.indent_symbol .. string.rep(full_opts.folder_indent, level - 1)
-        }
-        if type(attr) == "table" then
-          for k, v in pairs(attr) do
-            item[k] = v
-          end
-        end
-        table.insert(sort_data, item)
+        table.insert(
+          sort_data,
+          vim.tbl_deep_extend(
+            "force",
+            {
+              path = file_path,
+              name = dir_obj,
+              level = level,
+              indent = full_opts.indent_symbol .. string.rep(full_opts.folder_indent, level - 1)
+            },
+            lfs.attributes(file_path)
+          )
+        )
       end
     end
   end
@@ -480,7 +480,7 @@ local function prevent_other_buffers()
     vim.api.nvim_win_set_buf(0, tree_buffer)
     draw_tree()
     local not_tree_windows = current_tab_not_tree_window()
-    if #not_tree_windows > 0 then
+    if vim.tbl_count(not_tree_windows) > 0 then
       vim.api.nvim_win_set_buf(not_tree_windows[1], buffer)
       vim.api.nvim_set_current_win(not_tree_windows[1])
     end
@@ -489,7 +489,7 @@ end
 
 local function check_auto_close()
   local not_tree_windows = current_tab_not_tree_window()
-  if #not_tree_windows == 0 then
+  if vim.tbl_count(not_tree_windows) == 0 then
     vim.api.nvim_command("q")
   end
 end
