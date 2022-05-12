@@ -94,16 +94,6 @@ local full_opts = {
   choose_space = "    "
 }
 
-local function current_tab_windows()
-  local tab_windows = {}
-  for _, tab in ipairs(vim.fn.gettabinfo()) do
-    if tab.tabnr == vim.fn.tabpagenr() then
-      tab_windows = tab.windows
-    end
-  end
-  return tab_windows
-end
-
 local function is_simple_mode(window, type_name)
   local filetype = vim.api.nvim_buf_get_option(vim.api.nvim_win_get_buf(window), "filetype")
   return vim.tbl_contains(full_opts.simple_mode.ignore_type, type_name) and
@@ -227,27 +217,26 @@ local function load_win_statusline(win, is_cur)
 end
 
 local function load_wins_statusline()
-  for _, tab in ipairs(vim.fn.gettabinfo()) do
-    if tab.tabnr == vim.fn.tabpagenr() then
-      for k, win in ipairs(tab.windows) do
-        vim.api.nvim_win_set_option(win, "statusline", " ")
-        load_win_statusline(win, k == vim.fn.winnr())
-      end
-    end
+  for k, window in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    vim.api.nvim_win_set_option(window, "statusline", " ")
+    load_win_statusline(window, k == vim.fn.winnr())
   end
 end
 
 local function pandaline_augroup()
-  vim.cmd [[augroup PandaLine]]
-  vim.cmd [[autocmd!]]
-  vim.cmd [[autocmd BufEnter * lua require"pandaline".load_wins_statusline()]]
-  vim.cmd [[autocmd WinEnter * lua require"pandaline".load_wins_statusline()]]
-  vim.cmd [[augroup END]]
+  vim.api.nvim_create_autocmd(
+    {"BufEnter", "WinEnter"},
+    {
+      group = vim.api.nvim_create_augroup("PandaLine", {clear = true}),
+      callback = function()
+        load_wins_statusline()
+      end
+    }
+  )
 end
 
 local function load_pandaline_theme()
-  local theme = full_opts.theme
-  for k, v in pairs(theme) do
+  for k, v in pairs(full_opts.theme) do
     if v.bg == nil and v.fg == nil then
       break
     end
@@ -264,11 +253,10 @@ end
 
 local function load_web_icon()
   local web_devicons = require("nvim-web-devicons")
-  local has_loaded = web_devicons.has_loaded()
-  if has_loaded ~= true then
+  if not web_devicons.has_loaded() then
     web_devicons.setup()
   end
-  -- change all icon bgcolor
+  -- change all icon bg color
   for _, icon in pairs(web_devicons.get_icons()) do
     if icon.color and icon.name then
       local hl_group = icon.name and "PandalineDevIcon" .. icon.name
@@ -282,10 +270,8 @@ local function load_web_icon()
 end
 
 local function choose_win_statusline(win, show_item)
-  local mid_space = full_opts.choose_space
-  local mid = mid_space .. string.upper(show_item) .. mid_space
-  local width = vim.api.nvim_win_get_width(win)
-  local space = string.rep(" ", math.floor((width - #mid) / 2))
+  local mid = full_opts.choose_space .. string.upper(show_item) .. full_opts.choose_space
+  local space = string.rep(" ", math.floor((vim.api.nvim_win_get_width(win) - #mid) / 2))
   local left_fill = "%#PandaLineChooseWinFill#" .. space .. "%##"
   local right_fill = "%#PandaLineChooseWinFill#" .. space
   return left_fill .. "%#PandaLineChooseWin#" .. mid .. "%##" .. right_fill
@@ -314,7 +300,7 @@ local function choose_specify_windows(windows)
 end
 
 local function choose_win()
-  choose_specify_windows(current_tab_windows())
+  choose_specify_windows(vim.api.nvim_tabpage_list_wins(0))
 end
 
 local setup = function(opts)
@@ -328,7 +314,6 @@ end
 
 return {
   mode_name = mode_name,
-  load_wins_statusline = load_wins_statusline,
   choose_win = choose_win,
   choose_specify_windows = choose_specify_windows,
   setup = setup
