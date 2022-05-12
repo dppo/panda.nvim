@@ -1,8 +1,12 @@
+local utf = require "lua-utf8"
+local pl_path = require "pl.path"
+
 local full_opts = {
   icon_enable = true,
   win_width = 31,
   tree_name = "PandaTree",
   show_hidden = true,
+  hidden_reg = "^[.].*",
   indent_symbol = " ",
   folder_indent = "  ",
   root_name = " [ROOT] ",
@@ -48,22 +52,22 @@ local full_opts = {
       name = "Folder_root"
     },
     folder = {
-      icon = "",
+      icon = " ",
       color = "#61afef",
       name = "Folder"
     },
     folder_open = {
-      icon = "",
+      icon = " ",
       color = "#61afef",
       name = "Folder_open"
     },
     folder_node_modules = {
-      icon = "",
+      icon = " ",
       color = "#61afef",
       name = "Folder_node_modules"
     },
     folder_node_modules_open = {
-      icon = "",
+      icon = " ",
       color = "#61afef",
       name = "Folder_node_modules_open"
     },
@@ -98,51 +102,61 @@ local function is_buf_match_name(buf, name)
   return vim.api.nvim_buf_get_name(buf):match(".*/" .. name .. "$")
 end
 
+local function verify_is_tree_window(window)
+  return vim.api.nvim_win_is_valid(window) and vim.api.nvim_win_get_config(window).relative == "" and
+    vim.api.nvim_win_get_var(window, full_opts.tree_name)
+end
+
+local function current_tab_not_tree_window()
+  local not_tree_windows = {}
+  for _, window in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if not verify_is_tree_window(window) and vim.api.nvim_win_get_config(window).relative == "" then
+      table.insert(not_tree_windows, window)
+    end
+  end
+  return not_tree_windows
+end
+
+local function current_tab_tree_window()
+  local tree_window = nil
+  for _, window in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if verify_is_tree_window(window) then
+      tree_window = window
+    end
+  end
+  return tree_window
+end
+
 local function load_web_icon()
   local web_devicons = require("nvim-web-devicons")
-  local has_loaded = web_devicons.has_loaded()
-  if has_loaded ~= true then
+  if not web_devicons.has_loaded() then
     web_devicons.setup()
   end
   web_devicons.set_icon(full_opts.icon or {})
   -- change all icon bgcolor
-  local icons = web_devicons.get_icons()
-  for _, icon_data in pairs(icons) do
-    if icon_data.color and icon_data.name then
-      local hl_group = icon_data.name and "PandaTreeDevIcon" .. icon_data.name
+  for _, icon in pairs(web_devicons.get_icons()) do
+    if icon.color and icon.name then
+      local hl_group = icon.name and "PandaTreeDevIcon" .. icon.name
       if hl_group then
         vim.api.nvim_command(
-          "highlight! " .. hl_group .. " guifg=" .. icon_data.color .. " guibg=" .. full_opts["theme"]["PandaTree"].bg
+          "highlight! " .. hl_group .. " guifg=" .. icon.color .. " guibg=" .. full_opts.theme.PandaTree.bg
         )
       end
     end
   end
 end
 
-local function pandatree_augroup()
-  vim.cmd [[augroup PandaTree]]
-  vim.cmd [[autocmd!]]
-  vim.cmd [[autocmd WinNew * lua require"pandatree".set_win_default_var()]]
-  vim.cmd [[autocmd VimEnter * lua require"pandatree".set_win_default_var()]]
-  vim.cmd [[autocmd BufEnter * lua require"pandatree".check_auto_close()]]
-  vim.cmd [[autocmd BufEnter * lua require"pandatree".prevent_other_buffers()]]
-  vim.cmd [[augroup END]]
-end
-
 local function load_pandatree_theme()
-  local theme = full_opts["theme"]
-  for k, v in pairs(theme) do
-    local bg = v["bg"]
-    local fg = v["fg"]
-    if bg == nil and fg == nil then
+  for k, v in pairs(full_opts.theme) do
+    if v.bg == nil and v.fg == nil then
       break
     end
     local color_command = "hi " .. k .. " "
-    if bg ~= nil then
-      color_command = color_command .. "guibg=" .. bg .. " "
+    if v.bg ~= nil then
+      color_command = color_command .. "guibg=" .. v.bg .. " "
     end
-    if fg ~= nil then
-      color_command = color_command .. "guifg=" .. fg
+    if v.fg ~= nil then
+      color_command = color_command .. "guifg=" .. v.fg
     end
     vim.api.nvim_command(color_command)
   end
@@ -153,56 +167,19 @@ local function set_win_default_var()
 end
 
 local function set_all_win_default_var()
-  for _, tab in ipairs(vim.fn.gettabinfo()) do
-    for _, window in ipairs(tab.windows) do
-      vim.api.nvim_win_set_var(window, full_opts.tree_name, false)
-    end
+  for _, window in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    vim.api.nvim_win_set_var(window, full_opts.tree_name, false)
   end
 end
 
 local function current_tree_buffer()
   local tree_buffer = nil
-  local all_buffer = vim.fn.range(1, vim.fn.bufnr("$"))
-  for _, buffer in ipairs(all_buffer) do
+  for _, buffer in pairs(vim.api.nvim_list_bufs()) do
     if is_buf_match_name(buffer, full_opts.tree_name) then
       tree_buffer = buffer
     end
   end
   return tree_buffer
-end
-
-local function load_buffer_keymap(buffer)
-  local mappings = {
-    ["<cr>"] = "enter_row",
-    ["."] = "togger_show_hidden"
-    -- ["h"] = "upper_stage",
-    -- ["l"] = "lower_stage",
-    -- ["r"] = "redraw_tree_buffer",
-    -- ["<C-v>"] = "open_file_with_vsplit"
-  }
-  for k, v in pairs(mappings) do
-    vim.api.nvim_buf_set_keymap(
-      buffer,
-      "n",
-      k,
-      ":lua require'pandatree'." .. v .. "()<cr>",
-      {
-        nowait = true,
-        silent = true,
-        noremap = true
-      }
-    )
-  end
-end
-
-local function new_tree_buffer()
-  local buffer = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_name(buffer, full_opts.tree_name)
-  for k, v in pairs(full_opts["buffer_option"]) do
-    vim.api.nvim_buf_set_option(buffer, k, v)
-  end
-  load_buffer_keymap(buffer)
-  return buffer
 end
 
 local function sort_by_name(element1, elemnet2)
@@ -228,19 +205,17 @@ local function scandir(path, level)
   local sort_data = {}
   for dir_obj in lfs.dir(path) do
     if dir_obj ~= "." and dir_obj ~= ".." then
-      local file_path = path .. "/" .. dir_obj
-      local basename = require "pl.path".basename(file_path)
-      local hidden_str = "."
+      local file_path = path .. pl_path.sep .. dir_obj
       if
         not tmp_data.showHidden or
-          (tmp_data.showHidden and string.sub(basename, 1, string.len(hidden_str)) ~= hidden_str)
+          (tmp_data.showHidden and not string.match(pl_path.basename(file_path), full_opts.hidden_reg))
        then
         local attr = lfs.attributes(file_path)
         local item = {
           path = file_path,
           name = dir_obj,
           level = level,
-          indent = full_opts["indent_symbol"] .. string.rep(full_opts["folder_indent"], level - 1)
+          indent = full_opts.indent_symbol .. string.rep(full_opts.folder_indent, level - 1)
         }
         if type(attr) == "table" then
           for k, v in pairs(attr) do
@@ -272,7 +247,7 @@ local function scandir(path, level)
   for _, v in pairs(sort_data) do
     if v.mode == "directory" then
       table.insert(tmp_data.tree, v)
-      if v_include(tmp_data.openTree, v.path) ~= nil then
+      if vim.tbl_contains(tmp_data.openTree, v.path) then
         local icon_key = "folder_open"
         local icon_key1 = "folder_" .. v.name .. "_open"
         local icon_key2 = "folder_" .. v.name
@@ -281,8 +256,8 @@ local function scandir(path, level)
         elseif web_devicons.get_icon(icon_key2, icon_key2) ~= nil then
           icon_key = icon_key2
         end
-        v["icon"] = web_devicons.get_icon(icon_key, icon_key)
-        v["group"] = icon_key
+        v.icon = web_devicons.get_icon(icon_key, icon_key)
+        v.group = icon_key
         scandir(v.path, level + 1)
       else
         local icon_key = "folder"
@@ -290,8 +265,8 @@ local function scandir(path, level)
         if web_devicons.get_icon(icon_key1, icon_key1) ~= nil then
           icon_key = icon_key1
         end
-        v["icon"] = web_devicons.get_icon(icon_key, icon_key)
-        v["group"] = icon_key
+        v.icon = web_devicons.get_icon(icon_key, icon_key)
+        v.group = icon_key
       end
     else
       local extension = v.path:match("^.*%.(.*)$") or ""
@@ -299,11 +274,30 @@ local function scandir(path, level)
       if icon == nil then
         extension = "default"
       end
-      v["icon"] = web_devicons.get_icon(extension)
-      v["group"] = extension:gsub("^%l", string.upper)
+      v.icon =
+        string.rep(full_opts.indent_symbol, utf.width(full_opts.icon.folder.icon) - 1) ..
+        web_devicons.get_icon(extension)
+      v.group = extension:gsub("^%l", string.upper)
       table.insert(tmp_data.tree, v)
     end
   end
+end
+
+local function handler_show_file_name(file_name)
+  local max_file_name_width = full_opts.win_width - 2
+  local new_file_name = file_name
+  local idx, offset, width = utf.widthindex(file_name, max_file_name_width - 1)
+  if width ~= nil then
+    if offset ~= width then
+      new_file_name = utf.sub(file_name, 1, idx - 1) .. full_opts.indent_symbol
+    else
+      new_file_name = utf.sub(file_name, 1, idx)
+    end
+    new_file_name = new_file_name .. "…"
+  else
+    new_file_name = file_name .. string.rep(full_opts.indent_symbol, max_file_name_width - utf.width(file_name))
+  end
+  return new_file_name
 end
 
 local function draw_tree()
@@ -314,12 +308,12 @@ local function draw_tree()
   local hl_color = {}
   for k, v in pairs(tmp_data.tree) do
     if v.root == true then
-      table.insert(
-        lines,
-        v.indent .. (v.icon or " ") .. full_opts.root_name .. string.upper(require "pl.path".basename(v.path))
-      )
+      local root_name =
+        v.indent .. (v.icon or full_opts.indent_symbol) .. full_opts.root_name .. string.upper(pl_path.basename(v.path))
+      table.insert(lines, handler_show_file_name(root_name))
     else
-      table.insert(lines, v.indent .. (v.icon or " ") .. full_opts.indent_symbol .. v.name)
+      local file_name = v.indent .. (v.icon or full_opts.indent_symbol) .. full_opts.indent_symbol .. v.name
+      table.insert(lines, handler_show_file_name(file_name))
     end
     local line_color = {
       {
@@ -373,60 +367,9 @@ local function draw_tree()
   vim.api.nvim_buf_set_option(tree_buffer, "modifiable", false)
 end
 
-local function new_tree_window()
-  vim.api.nvim_command("vsplit")
-  vim.api.nvim_command("wincmd H")
-  vim.api.nvim_command("vertical resize " .. full_opts["win_width"])
-  vim.api.nvim_win_set_var(0, full_opts.tree_name, true)
-
-  for k, v in pairs(full_opts["window_option"]) do
-    vim.api.nvim_win_set_option(0, k, v)
-  end
-
-  local tree_buffer = current_tree_buffer()
-  if tree_buffer == nil then
-    tree_buffer = new_tree_buffer()
-  end
-  vim.api.nvim_win_set_buf(0, tree_buffer)
+local function togger_show_hidden()
+  tmp_data.showHidden = not tmp_data.showHidden
   draw_tree()
-end
-
-local function verify_is_tree_window(window)
-  if
-    vim.api.nvim_win_is_valid(window) and vim.api.nvim_win_get_config(window)["relative"] == "" and
-      vim.api.nvim_win_get_var(window, full_opts.tree_name) == true
-   then
-    return true
-  end
-  return false
-end
-
-local function current_tab_not_tree_window()
-  local not_tree_windows = {}
-  for _, tab in ipairs(vim.fn.gettabinfo()) do
-    if vim.fn.tabpagenr() == tab.tabnr then
-      for _, window in pairs(tab.windows) do
-        if verify_is_tree_window(window) == false and vim.api.nvim_win_get_config(window)["relative"] == "" then
-          table.insert(not_tree_windows, window)
-        end
-      end
-    end
-  end
-  return not_tree_windows
-end
-
-local function current_tab_tree_window()
-  local tree_window = nil
-  for _, tab in ipairs(vim.fn.gettabinfo()) do
-    if vim.fn.tabpagenr() == tab.tabnr and #tab.windows > 1 then
-      for _, window in ipairs(tab.windows) do
-        if verify_is_tree_window(window) then
-          tree_window = window
-        end
-      end
-    end
-  end
-  return tree_window
 end
 
 local function get_cursor_row()
@@ -443,10 +386,10 @@ end
 
 local function open_file(item)
   local not_tree_windows = current_tab_not_tree_window()
-  if #not_tree_windows == 0 then
+  if vim.tbl_isempty(not_tree_windows) then
     open_new_file(item)
   else
-    if #not_tree_windows == 1 then
+    if vim.tbl_count(not_tree_windows) == 1 then
       vim.api.nvim_set_current_win(not_tree_windows[1])
     else
       require "pandaline".choose_specify_windows(not_tree_windows)
@@ -461,7 +404,7 @@ local function enter_row()
     if item.root == true then
       return
     end
-    if item["mode"] == "file" then
+    if item.mode == "file" then
       open_file(item)
     else
       local index = v_include(tmp_data.openTree, item.path)
@@ -473,6 +416,58 @@ local function enter_row()
       draw_tree()
     end
   end
+end
+
+local function load_buffer_keymap(buffer)
+  local mappings = {
+    ["<cr>"] = "enter_row",
+    ["."] = "togger_show_hidden",
+    ["r"] = "draw_tree"
+    -- ["h"] = "upper_stage",
+    -- ["l"] = "lower_stage",
+    -- ["<C-v>"] = "open_file_with_vsplit"
+  }
+  for k, v in pairs(mappings) do
+    vim.api.nvim_buf_set_keymap(
+      buffer,
+      "n",
+      k,
+      ":lua require'pandatree'." .. v .. "()<cr>",
+      {
+        nowait = true,
+        silent = true,
+        noremap = true
+      }
+    )
+  end
+end
+
+local function new_tree_buffer()
+  local buffer = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_name(buffer, full_opts.tree_name)
+  for k, v in pairs(full_opts.buffer_option) do
+    vim.api.nvim_buf_set_option(buffer, k, v)
+  end
+  load_buffer_keymap(buffer)
+  return buffer
+end
+
+local function new_tree_window()
+  vim.api.nvim_command("vsplit")
+  vim.api.nvim_command("wincmd H")
+  vim.api.nvim_command("vertical resize " .. full_opts.win_width)
+  vim.api.nvim_win_set_var(0, full_opts.tree_name, true)
+
+  for k, v in pairs(full_opts.window_option) do
+    vim.api.nvim_win_set_option(0, k, v)
+  end
+
+  local tree_buffer = current_tree_buffer()
+  if tree_buffer == nil then
+    tree_buffer = new_tree_buffer()
+  end
+  vim.api.nvim_win_set_buf(0, tree_buffer)
+  draw_tree()
 end
 
 local function prevent_other_buffers()
@@ -492,11 +487,6 @@ local function prevent_other_buffers()
   end
 end
 
-local function togger_show_hidden()
-  tmp_data.showHidden = not tmp_data.showHidden
-  draw_tree()
-end
-
 local function check_auto_close()
   local not_tree_windows = current_tab_not_tree_window()
   if #not_tree_windows == 0 then
@@ -504,20 +494,43 @@ local function check_auto_close()
   end
 end
 
+local function pandatree_augroup()
+  local au_group = vim.api.nvim_create_augroup("PandaTree", {clear = true})
+  vim.api.nvim_create_autocmd(
+    {"WinNew", "VimEnter"},
+    {
+      group = au_group,
+      callback = function()
+        set_win_default_var()
+      end
+    }
+  )
+  vim.api.nvim_create_autocmd(
+    {"BufEnter"},
+    {
+      group = au_group,
+      callback = function()
+        check_auto_close()
+        prevent_other_buffers()
+      end
+    }
+  )
+end
+
 local setup = function(opts)
   tmp_data.isSetUp = true
   full_opts = vim.tbl_deep_extend("force", full_opts, opts or {})
-  if full_opts["icon_enable"] == true then
+  if full_opts.icon_enable then
     load_web_icon()
   end
-  tmp_data.showHidden = full_opts["show_hidden"]
+  tmp_data.showHidden = full_opts.show_hidden
   load_pandatree_theme()
   pandatree_augroup()
   set_all_win_default_var()
 end
 
 local togger_tree = function()
-  if tmp_data.isSetUp == false then
+  if not tmp_data.isSetUp then
     setup()
   end
   local tree_window = current_tab_tree_window()
@@ -531,9 +544,7 @@ end
 return {
   togger_tree = togger_tree,
   setup = setup,
-  set_win_default_var = set_win_default_var,
   enter_row = enter_row,
-  check_auto_close = check_auto_close,
   togger_show_hidden = togger_show_hidden,
-  prevent_other_buffers = prevent_other_buffers
+  draw_tree = draw_tree
 }
