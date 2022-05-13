@@ -6,7 +6,7 @@ local full_opts = {
   icon_enable = true,
   win_width = 31,
   tree_name = "PandaTree",
-  show_hidden = true,
+  show_hidden = false,
   hidden_reg = "^[.].*",
   indent_symbol = " ",
   folder_indent = "  ",
@@ -30,7 +30,19 @@ local full_opts = {
   },
   git = {
     enable = true,
-    command = "git"
+    command = "git",
+    icon = {
+      Added = "+",
+      Modified = "✹",
+      Deleted = "✗",
+      Staged = "✔︎",
+      Renamed = "➜",
+      Unmerged = "═",
+      Untracked = "✭",
+      Ignored = "☒",
+      Unknown = "?",
+      Default = " "
+    }
   },
   theme = {
     PandaTree = {
@@ -47,6 +59,10 @@ local full_opts = {
     },
     PandaTreeIndent = {
       bg = "NONE",
+      fg = "#000000"
+    },
+    PandaTreeSpecialFile = {
+      bg = "#FF0000",
       fg = "#000000"
     }
   },
@@ -85,6 +101,43 @@ local full_opts = {
 }
 
 local tmp_data = {
+  git_status_map = {
+    [" A"] = {"Added"},
+    [" M"] = {"Modified"},
+    [" D"] = {"Deleted"},
+    ["M "] = {"Staged"},
+    ["MM"] = {"Modified"},
+    ["MT"] = {"Modified"},
+    ["MD"] = {"Deleted"},
+    ["T "] = {"Staged"},
+    ["TM"] = {"Modified"},
+    ["TT"] = {"Modified"},
+    ["TD"] = {"Deleted"},
+    ["A "] = {"Staged"},
+    ["AM"] = {"Modified"},
+    ["AT"] = {"Modified"},
+    ["AD"] = {"Deleted"},
+    ["D "] = {"Deleted"},
+    ["R "] = {"Renamed"},
+    ["RM"] = {"Modified"},
+    ["RT"] = {"Modified"},
+    ["RD"] = {"Deleted"},
+    ["C "] = {"Staged"},
+    ["CM"] = {"Modified"},
+    ["CT"] = {"Modified"},
+    ["CD"] = {"Deleted"},
+    [" R"] = {"Renamed"},
+    [" C"] = {"Modified"},
+    ["DD"] = {"Unmerged"},
+    ["AU"] = {"Unmerged"},
+    ["UD"] = {"Unmerged"},
+    ["UA"] = {"Unmerged"},
+    ["DU"] = {"Unmerged"},
+    ["AA"] = {"Unmerged"},
+    ["UU"] = {"Unmerged"},
+    ["??"] = {"Untracked"},
+    ["!!"] = {"Ignored"}
+  },
   isSetUp = false,
   showHidden = true,
   openTree = {},
@@ -191,6 +244,11 @@ local function win_get_cursor_row()
   return tmp_data.tree[row]
 end
 
+local function verify_file_need_show(file_path)
+  return tmp_data.showHidden or
+    (not tmp_data.showHidden and not string.match(pl_path.basename(file_path), full_opts.hidden_reg))
+end
+
 local function smart_open_file(buf, path)
   local free_wins = {}
   for _, win in pairs(tabpage_list_not_tree_wins()) do
@@ -280,10 +338,7 @@ local function scandir(path, level)
   for dir_obj in lfs.dir(path) do
     if dir_obj ~= "." and dir_obj ~= ".." then
       local file_path = pl_path.join(path, dir_obj)
-      if
-        not tmp_data.showHidden or
-          (tmp_data.showHidden and not string.match(pl_path.basename(file_path), full_opts.hidden_reg))
-       then
+      if verify_file_need_show(file_path) then
         table.insert(
           sort_data,
           vim.tbl_deep_extend(
@@ -383,12 +438,34 @@ local function load_git_status()
   local command = 'cd "' .. vim.loop.cwd() .. '" && "' .. full_opts.git.command .. '" status --porcelain=v1 -u'
   for _, v in pairs(vim.fn.systemlist(command)) do
     if string.find(v, "fatal: not a git repository") == nil then
+      -- 中文乱码问题解决 - git config --global core.quotepath false
       local path = v:sub(4, -1)
       if path:match("%->") ~= nil then
         path = path:gsub("^.* %-> ", "")
       end
-      local full_path = pl_path.join(vim.loop.cwd(), path)
-      tmp_data.gitStatus[full_path] = v:sub(0, 2)
+      local tmp_path = vim.loop.cwd()
+      if verify_file_need_show(pl_path.join(tmp_path, path)) then
+        local git_status = v:sub(0, 2)
+        for v2 in string.gmatch(path, "([^" .. pl_path.sep .. "]+)") do
+          tmp_path = pl_path.join(tmp_path, v2)
+          local git_status_icon = tmp_data.git_status_map[git_status]
+          if git_status_icon == nil then
+            git_status_icon = {"Unknown"}
+          end
+          if vim.tbl_count(git_status_icon) == 1 then
+            table.insert(git_status_icon, 1, "Default")
+          end
+          local show_git_status = ""
+          for _, icon in pairs(git_status_icon) do
+            local icon_key = icon
+            if pl_path.isdir(tmp_path) and icon_key ~= "Default" then
+              icon_key = "Modified"
+            end
+            show_git_status = show_git_status .. full_opts.git.icon[icon_key]
+          end
+          tmp_data.gitStatus[tmp_path] = show_git_status
+        end
+      end
     end
   end
 end
@@ -543,6 +620,24 @@ local function create_pandatree_augroup()
         win_check_auto_close()
         win_prevent_other_bufs_enter()
         win_keep_tree_size()
+      end
+    }
+  )
+  vim.api.nvim_create_autocmd(
+    {"VimResized"},
+    {
+      group = au_group,
+      callback = function()
+        win_keep_tree_size()
+      end
+    }
+  )
+  vim.api.nvim_create_autocmd(
+    {"BufWritePost", "FileChangedShellPost", "FocusGained"},
+    {
+      group = au_group,
+      callback = function()
+        draw_tree()
       end
     }
   )
