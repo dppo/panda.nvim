@@ -188,7 +188,8 @@ local function buf_set_keymap(buf)
   local mappings = {
     ["<cr>"] = "enter_row",
     ["."] = "togger_show_hidden",
-    ["r"] = "draw_tree"
+    ["r"] = "draw_tree",
+    ["o"] = "reveal_in_finder"
     -- ["h"] = "upper_stage",
     -- ["l"] = "lower_stage",
     -- ["<C-v>"] = "open_file_with_vsplit"
@@ -566,6 +567,19 @@ local function enter_row()
   end
 end
 
+local function reveal_in_finder()
+  local item = win_get_cursor_row()
+  local dir_path = item.path
+  if pl_path.isfile(dir_path) then
+    dir_path = pl_path.dirname(dir_path)
+  end
+  local cmd = "open"
+  if pl_path.is_windows then
+    cmd = "start"
+  end
+  vim.fn.system(cmd .. " " .. dir_path)
+end
+
 local function create_tree_win()
   vim.api.nvim_command("vsplit")
   vim.api.nvim_command("wincmd H")
@@ -674,5 +688,6 @@ return {
   setup = setup,
   enter_row = enter_row,
   togger_show_hidden = togger_show_hidden,
-  draw_tree = draw_tree
+  draw_tree = draw_tree,
+  reveal_in_finder = reveal_in_finder
 }
