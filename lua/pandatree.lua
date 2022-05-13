@@ -191,6 +191,37 @@ local function win_get_cursor_row()
   return tmp_data.tree[row]
 end
 
+local function smart_open_file(buf, path)
+  local free_wins = {}
+  for _, win in pairs(tabpage_list_not_tree_wins()) do
+    if vim.fn.getbufinfo(vim.api.nvim_win_get_buf(win))[1].changed == 0 then
+      table.insert(free_wins, win)
+    end
+  end
+  local is_edit = false
+  local free_wins_count = vim.tbl_count(free_wins)
+  if free_wins_count == 0 then
+    if buf then
+      vim.api.nvim_command("vs sb" .. buf)
+    else
+      vim.api.nvim_command("vs" .. path)
+    end
+  elseif free_wins_count == 1 then
+    vim.api.nvim_set_current_win(free_wins[1])
+    is_edit = true
+  else
+    require "pandaline".choose_specify_windows(free_wins)
+    is_edit = true
+  end
+  if is_edit then
+    if buf then
+      vim.api.nvim_win_set_buf(free_wins[1], buf)
+    else
+      vim.api.nvim_command("edit " .. path)
+    end
+  end
+end
+
 local function sort_by_name(element1, elemnet2)
   if element1 == nil or elemnet2 == nil or element1.mode == nil or elemnet2.mode == nil then
     return false
@@ -436,28 +467,6 @@ local function togger_show_hidden()
   draw_tree()
 end
 
-local function open_new_file(item)
-  vim.api.nvim_command("vsplit " .. item.path)
-  vim.api.nvim_command("wincmd h")
-  vim.api.nvim_command("vertical resize " .. full_opts.win_width)
-  vim.api.nvim_command("wincmd l")
-end
-
-local function open_file(item)
-  local not_tree_wins = tabpage_list_not_tree_wins()
-  if vim.tbl_isempty(not_tree_wins) then
-    open_new_file(item)
-  else
-    if vim.tbl_count(not_tree_wins) == 1 then
-      -- TODO 判断是否未保存
-      vim.api.nvim_set_current_win(not_tree_wins[1])
-    else
-      require "pandaline".choose_specify_windows(not_tree_wins)
-    end
-    vim.api.nvim_command("edit " .. item.path)
-  end
-end
-
 local function enter_row()
   local item = win_get_cursor_row()
   if item ~= nil then
@@ -465,7 +474,7 @@ local function enter_row()
       return
     end
     if item.mode == "file" then
-      open_file(item)
+      smart_open_file(nil, item.path)
     else
       local index = v_include(tmp_data.openTree, item.path)
       if index ~= nil then
@@ -497,12 +506,7 @@ local function win_prevent_other_bufs_enter()
     local prevent_buf = vim.fn.bufnr()
     vim.api.nvim_win_set_buf(0, panda_tree_buf())
     draw_tree()
-    local not_tree_wins = tabpage_list_not_tree_wins()
-    -- TODO 多win选择
-    if vim.tbl_count(not_tree_wins) > 0 then
-      vim.api.nvim_win_set_buf(not_tree_wins[1], prevent_buf)
-      vim.api.nvim_set_current_win(not_tree_wins[1])
-    end
+    smart_open_file(prevent_buf)
   end
 end
 
@@ -510,6 +514,13 @@ local function win_check_auto_close()
   local not_tree_wins = tabpage_list_not_tree_wins()
   if vim.tbl_count(not_tree_wins) == 0 then
     vim.api.nvim_command("q")
+  end
+end
+
+local function win_keep_tree_size()
+  local tree_win = tabpage_tree_win()
+  if tree_win ~= nil and vim.api.nvim_win_get_width(tree_win) ~= full_opts.win_width then
+    vim.api.nvim_win_set_width(tree_win, full_opts.win_width)
   end
 end
 
@@ -531,6 +542,7 @@ local function create_pandatree_augroup()
       callback = function()
         win_check_auto_close()
         win_prevent_other_bufs_enter()
+        win_keep_tree_size()
       end
     }
   )
