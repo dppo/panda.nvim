@@ -11,6 +11,7 @@ local full_opts = {
   indent_symbol = " ",
   folder_indent = "  ",
   root_name = " [ROOT] ",
+  auto_close_subdir = true,
   buf_opts = {
     swapfile = false,
     buftype = "nofile",
@@ -144,15 +145,6 @@ local tmp_data = {
   tree = {},
   gitStatus = {}
 }
-
-local function v_include(tab, value)
-  for k, v in pairs(tab) do
-    if v == value then
-      return k
-    end
-  end
-  return nil
-end
 
 local function win_is_not_float(win)
   return vim.api.nvim_win_get_config(win).relative == ""
@@ -553,9 +545,19 @@ local function enter_row()
     if item.mode == "file" then
       smart_open_file(nil, item.path)
     else
-      local index = v_include(tmp_data.openTree, item.path)
-      if index ~= nil then
-        table.remove(tmp_data.openTree, index)
+      if vim.tbl_contains(tmp_data.openTree, item.path) then
+        tmp_data.openTree =
+          vim.tbl_filter(
+          function(path)
+            if path == item.path then
+              return false
+            elseif full_opts.auto_close_subdir then
+              return pl_path.common_prefix(path, item.path) ~= item.path
+            end
+            return true
+          end,
+          tmp_data.openTree
+        )
       else
         table.insert(tmp_data.openTree, item.path)
       end
