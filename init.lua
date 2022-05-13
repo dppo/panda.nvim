@@ -230,7 +230,7 @@ require("formatter").setup(
 
 require("scrollview").setup(
   {
-    excluded_filetypes = {"NvimTree"},
+    excluded_filetypes = {"NvimTree", "PandaTree"},
     current_only = true
   }
 )
