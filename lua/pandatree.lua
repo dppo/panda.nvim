@@ -189,9 +189,9 @@ local function buf_set_keymap(buf)
     ["<cr>"] = "enter_row",
     ["."] = "togger_show_hidden",
     ["r"] = "draw_tree",
-    ["o"] = "reveal_in_finder"
-    -- ["h"] = "upper_stage",
-    -- ["l"] = "lower_stage",
+    ["o"] = "reveal_in_finder",
+    ["h"] = "upper_stage",
+    ["l"] = "lower_stage"
     -- ["<C-v>"] = "open_file_with_vsplit"
   }
   for k, v in pairs(mappings) do
@@ -380,7 +380,9 @@ local function scandir(path, level)
         end
         v.icon = web_devicons.get_icon(icon_key, icon_key)
         v.group = icon_key
-        scandir(v.path, level + 1)
+        if not v.root then
+          scandir(v.path, level + 1)
+        end
       else
         local icon_key = "folder"
         local icon_key1 = "folder_" .. v.name
@@ -580,6 +582,19 @@ local function reveal_in_finder()
   vim.fn.system(cmd .. " " .. dir_path)
 end
 
+local function upper_stage()
+  vim.api.nvim_command("cd " .. pl_path.dirname(vim.loop.cwd()))
+  draw_tree()
+end
+
+local function lower_stage()
+  local item = win_get_cursor_row()
+  if pl_path.isdir(item.path) then
+    vim.api.nvim_command("cd " .. item.path)
+    draw_tree()
+  end
+end
+
 local function create_tree_win()
   vim.api.nvim_command("vsplit")
   vim.api.nvim_command("wincmd H")
@@ -689,5 +704,7 @@ return {
   enter_row = enter_row,
   togger_show_hidden = togger_show_hidden,
   draw_tree = draw_tree,
-  reveal_in_finder = reveal_in_finder
+  reveal_in_finder = reveal_in_finder,
+  upper_stage = upper_stage,
+  lower_stage = lower_stage
 }
