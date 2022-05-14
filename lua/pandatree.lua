@@ -1,5 +1,7 @@
 local utf = require "lua-utf8"
 local pl_path = require "pl.path"
+local pl_dir = require "pl.dir"
+local pl_file = require "pl.file"
 local lfs = require "lfs"
 
 local full_opts = {
@@ -146,6 +148,12 @@ local tmp_data = {
   gitStatus = {}
 }
 
+local function copy_to_system_clipboard(content)
+  vim.fn.setreg("+", content)
+  vim.fn.setreg('"', content)
+  vim.api.nvim_out_write(string.format("Copied %s to system clipboard! \n", content))
+end
+
 local function win_is_not_float(win)
   return vim.api.nvim_win_get_config(win).relative == ""
 end
@@ -191,8 +199,13 @@ local function buf_set_keymap(buf)
     ["r"] = "draw_tree",
     ["o"] = "reveal_in_finder",
     ["h"] = "upper_stage",
-    ["l"] = "lower_stage"
-    -- ["<C-v>"] = "open_file_with_vsplit"
+    ["l"] = "lower_stage",
+    ["y"] = "copy_name",
+    ["<C-v>"] = "vsplit_open_file",
+    ["<C-a>"] = "add_file",
+    ["<C-d>"] = "delete_file",
+    ["<C-r>"] = "rename_file",
+    ["<C-y>"] = "copy_file_path"
   }
   for k, v in pairs(mappings) do
     vim.api.nvim_buf_set_keymap(
@@ -595,6 +608,109 @@ local function lower_stage()
   end
 end
 
+local function vsplit_open_file()
+  local item = win_get_cursor_row()
+  vim.api.nvim_command("vs" .. item.path)
+end
+
+local function add_file()
+  local item = win_get_cursor_row()
+  local dir_path = item.path
+  if pl_path.isfile(dir_path) then
+    dir_path = pl_path.dirname(dir_path)
+  end
+  local new_file = vim.fn.input("Create file/directory: " .. dir_path .. pl_path.sep)
+  vim.api.nvim_command("normal :esc<CR>")
+  if new_file == nil or #new_file == 0 then
+    return
+  end
+  new_file = pl_path.join(dir_path, new_file)
+  if string.sub(new_file, -string.len(pl_path.sep)) == pl_path.sep then
+    local success, msg = pl_dir.makepath(new_file)
+    if not success then
+      vim.api.nvim_err_writeln(msg)
+      return
+    end
+  else
+    dir_path = pl_path.dirname(new_file)
+    if not pl_path.exists(dir_path) then
+      local success, msg = pl_dir.makepath(dir_path)
+      if not success then
+        vim.api.nvim_err_writeln(msg)
+        return
+      end
+    end
+    local success, msg = pl_file.write(new_file, "", false)
+    if not success then
+      vim.api.nvim_err_writeln(msg)
+      return
+    end
+  end
+  draw_tree()
+end
+
+local function delete_file()
+  local item = win_get_cursor_row()
+  local res = vim.fn.input("Remove " .. item.path .. " ? Y/n: ")
+  vim.api.nvim_command("normal :esc<CR>")
+  if res ~= "Y" then
+    return
+  end
+  if pl_path.isdir(item.path) then
+    local success, msg, code = pl_path.rmdir(item.path)
+    if not success then
+      if code == 66 then
+        res =
+          vim.fn.input(pl_path.basename(item.path) .. " not empty. Are you sure to delete all self files" .. " ? Y/n: ")
+        vim.api.nvim_command("normal :esc<CR>")
+        if res == "Y" then
+          success, msg = pl_dir.rmtree(item.path)
+          if not success then
+            vim.api.nvim_err_writeln(msg)
+            return
+          end
+        end
+      else
+        vim.api.nvim_err_writeln(msg)
+        return
+      end
+    end
+  else
+    local success, msg = pl_file.delete(item.path)
+    if not success then
+      vim.api.nvim_err_writeln(msg)
+      return
+    end
+  end
+  draw_tree()
+end
+
+local function rename_file()
+  local item = win_get_cursor_row()
+  local new_path = vim.fn.input("Rename " .. item.path .. " to ", item.path)
+  vim.api.nvim_command("normal :esc<CR>")
+  if new_path == nil or #new_path == 0 or item.path == new_path then
+    return
+  end
+  local success, msg = vim.loop.fs_rename(item.path, new_path)
+  if not success then
+    vim.api.nvim_err_writeln(msg)
+    return
+  end
+  if vim.tbl_contains(tmp_data.openTree, item.path) then
+    table.insert(tmp_data.openTree, new_path)
+  end
+  draw_tree()
+end
+
+local function copy_name()
+  copy_to_system_clipboard(pl_path.basename(win_get_cursor_row().path))
+end
+
+local function copy_file_path()
+  copy_to_system_clipboard(win_get_cursor_row().path)
+end
+
 local function create_tree_win()
   vim.api.nvim_command("vsplit")
   vim.api.nvim_command("wincmd H")
@@ -706,5 +822,11 @@ return {
   draw_tree = draw_tree,
   reveal_in_finder = reveal_in_finder,
   upper_stage = upper_stage,
-  lower_stage = lower_stage
+  lower_stage = lower_stage,
+  vsplit_open_file = vsplit_open_file,
+  add_file = add_file,
+  delete_file = delete_file,
+  rename_file = rename_file,
+  copy_name = copy_name,
+  copy_file_path = copy_file_path
 }
