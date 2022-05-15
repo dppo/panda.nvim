@@ -38,3 +38,4 @@ require "nvim-treesitter.configs".setup {
 require("format")
 require("notice")
 require("completion")
+require("git")

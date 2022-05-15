@@ -64,29 +64,4 @@ require("basic")
 require("im_select")
 require("panda")
 require("plugin")
-
-local actions = require("telescope.actions")
-require("telescope").setup {
-  defaults = {
-    mappings = {
-      i = {
-        ["<esc>"] = actions.close
-      }
-    }
-  }
-}
-
--- keymap
-vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>w", ":lua require'panda.pandaline'.choose_win()<CR>", {silent = true})
-vim.keymap.set("n", "<leader>cf", ":Format<CR>", {silent = true})
-vim.keymap.set("n", "<leader>t", ":NvimTreeToggle<CR>", {silent = true})
-vim.keymap.set("n", "<leader>e", ":lua require'panda.pandatree'.togger_tree()<CR>", {silent = true})
-vim.keymap.set("n", "<leader>ss", "<Plug>(easymotion-s2)", {})
-vim.keymap.set("", "<leader>cc", "<Plug>NERDCommenterToggle", {})
-vim.keymap.set("", "<leader>cm", "<Plug>NERDCommenterMinimal", {})
-
-vim.keymap.set("n", "<leader>ff", ":lua require('telescope.builtin').find_files()<CR>", {})
-vim.keymap.set("n", "<leader>fg", ":lua require('telescope.builtin').live_grep()<CR>", {})
-vim.keymap.set("n", "<leader>fb", ":lua require('telescope.builtin').buffers()<CR>", {})
-vim.keymap.set("n", "<leader>fh", ":lua require('telescope.builtin').help_tags()<CR>", {})
+require("keymap")
