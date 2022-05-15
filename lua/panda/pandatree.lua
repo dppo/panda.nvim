@@ -1,9 +1,3 @@
-local utf = require "lua-utf8"
-local pl_path = require "pl.path"
-local pl_dir = require "pl.dir"
-local pl_file = require "pl.file"
-local lfs = require "lfs"
-
 local full_opts = {
   icon_enable = true,
   win_width = 31,
@@ -212,7 +206,7 @@ local function buf_set_keymap(buf)
       buf,
       "n",
       k,
-      ":lua require'pandatree'." .. v .. "()<cr>",
+      ":lua require'panda.pandatree'." .. v .. "()<cr>",
       {
         nowait = true,
         silent = true,
@@ -252,7 +246,7 @@ end
 
 local function verify_file_need_show(file_path)
   return tmp_data.showHidden or
-    (not tmp_data.showHidden and not string.match(pl_path.basename(file_path), full_opts.hidden_reg))
+    (not tmp_data.showHidden and not string.match(require "pl.path".basename(file_path), full_opts.hidden_reg))
 end
 
 local function smart_open_file(buf, path)
@@ -274,7 +268,7 @@ local function smart_open_file(buf, path)
     vim.api.nvim_set_current_win(free_wins[1])
     is_edit = true
   else
-    require "pandaline".choose_specify_windows(free_wins)
+    require "panda.pandaline".choose_specify_windows(free_wins)
     is_edit = true
   end
   if is_edit then
@@ -341,9 +335,9 @@ end
 
 local function scandir(path, level)
   local sort_data = {}
-  for dir_obj in lfs.dir(path) do
+  for dir_obj in require "lfs".dir(path) do
     if dir_obj ~= "." and dir_obj ~= ".." then
-      local file_path = pl_path.join(path, dir_obj)
+      local file_path = require "pl.path".join(path, dir_obj)
       if verify_file_need_show(file_path) then
         table.insert(
           sort_data,
@@ -355,7 +349,7 @@ local function scandir(path, level)
               level = level,
               indent = full_opts.indent_symbol .. string.rep(full_opts.folder_indent, level - 1)
             },
-            lfs.attributes(file_path)
+            require "lfs".attributes(file_path)
           )
         )
       end
@@ -412,7 +406,7 @@ local function scandir(path, level)
         extension = "default"
       end
       v.icon =
-        string.rep(full_opts.indent_symbol, utf.width(full_opts.icon.folder.icon) - 1) ..
+        string.rep(full_opts.indent_symbol, require "lua-utf8".width(full_opts.icon.folder.icon) - 1) ..
         web_devicons.get_icon(extension)
       v.group = extension:gsub("^%l", string.upper)
       table.insert(tmp_data.tree, v)
@@ -423,16 +417,17 @@ end
 local function handler_show_file_name(file_path, file_name)
   local max_file_name_width = full_opts.win_width - 2
   local new_file_name = file_name
-  local idx, offset, width = utf.widthindex(file_name, max_file_name_width - 1)
+  local idx, offset, width = require "lua-utf8".widthindex(file_name, max_file_name_width - 1)
   if width ~= nil then
     if offset ~= width then
-      new_file_name = utf.sub(file_name, 1, idx - 1) .. full_opts.indent_symbol
+      new_file_name = require "lua-utf8".sub(file_name, 1, idx - 1) .. full_opts.indent_symbol
     else
-      new_file_name = utf.sub(file_name, 1, idx)
+      new_file_name = require "lua-utf8".sub(file_name, 1, idx)
     end
     new_file_name = new_file_name .. "…"
   else
-    new_file_name = file_name .. string.rep(full_opts.indent_symbol, max_file_name_width - utf.width(file_name))
+    new_file_name =
+      file_name .. string.rep(full_opts.indent_symbol, max_file_name_width - require "lua-utf8".width(file_name))
   end
   if vim.tbl_contains(vim.tbl_keys(tmp_data.gitStatus), file_path) then
     new_file_name = new_file_name .. tmp_data.gitStatus[file_path]
@@ -452,10 +447,10 @@ local function load_git_status()
         path = path:gsub("^.* %-> ", "")
       end
       local tmp_path = vim.loop.cwd()
-      if verify_file_need_show(pl_path.join(tmp_path, path)) then
+      if verify_file_need_show(require "pl.path".join(tmp_path, path)) then
         local git_status = v:sub(0, 2)
-        for v2 in string.gmatch(path, "([^" .. pl_path.sep .. "]+)") do
-          tmp_path = pl_path.join(tmp_path, v2)
+        for v2 in string.gmatch(path, "([^" .. require "pl.path".sep .. "]+)") do
+          tmp_path = require "pl.path".join(tmp_path, v2)
           local git_status_icon = tmp_data.git_status_map[git_status]
           if git_status_icon == nil then
             git_status_icon = {"Unknown"}
@@ -466,7 +461,7 @@ local function load_git_status()
           local show_git_status = ""
           for _, icon in pairs(git_status_icon) do
             local icon_key = icon
-            if pl_path.isdir(tmp_path) and icon_key ~= "Default" then
+            if require "pl.path".isdir(tmp_path) and icon_key ~= "Default" then
               icon_key = "Modified"
             end
             show_git_status = show_git_status .. full_opts.git.icon[icon_key]
@@ -489,7 +484,8 @@ local function draw_tree()
   for k, v in pairs(tmp_data.tree) do
     if v.root == true then
       local root_name =
-        v.indent .. (v.icon or full_opts.indent_symbol) .. full_opts.root_name .. string.upper(pl_path.basename(v.path))
+        v.indent ..
+        (v.icon or full_opts.indent_symbol) .. full_opts.root_name .. string.upper(require "pl.path".basename(v.path))
       table.insert(lines, handler_show_file_name(v.path, root_name))
     else
       local file_name = v.indent .. (v.icon or full_opts.indent_symbol) .. full_opts.indent_symbol .. v.name
@@ -568,7 +564,7 @@ local function enter_row()
             if path == item.path then
               return false
             elseif full_opts.auto_close_subdir then
-              return pl_path.common_prefix(path, item.path) ~= item.path
+              return require "pl.path".common_prefix(path, item.path) ~= item.path
             end
             return true
           end,
@@ -585,24 +581,24 @@ end
 local function reveal_in_finder()
   local item = win_get_cursor_row()
   local dir_path = item.path
-  if pl_path.isfile(dir_path) then
-    dir_path = pl_path.dirname(dir_path)
+  if require "pl.path".isfile(dir_path) then
+    dir_path = require "pl.path".dirname(dir_path)
   end
   local cmd = "open"
-  if pl_path.is_windows then
+  if require "pl.path".is_windows then
     cmd = "start"
   end
   vim.fn.system(cmd .. " " .. dir_path)
 end
 
 local function upper_stage()
-  vim.api.nvim_command("cd " .. pl_path.dirname(vim.loop.cwd()))
+  vim.api.nvim_command("cd " .. require "pl.path".dirname(vim.loop.cwd()))
   draw_tree()
 end
 
 local function lower_stage()
   local item = win_get_cursor_row()
-  if pl_path.isdir(item.path) then
+  if require "pl.path".isdir(item.path) then
     vim.api.nvim_command("cd " .. item.path)
     draw_tree()
   end
@@ -616,31 +612,31 @@ end
 local function add_file()
   local item = win_get_cursor_row()
   local dir_path = item.path
-  if pl_path.isfile(dir_path) then
-    dir_path = pl_path.dirname(dir_path)
+  if require "pl.path".isfile(dir_path) then
+    dir_path = require "pl.path".dirname(dir_path)
   end
-  local new_file = vim.fn.input("Create file/directory: " .. dir_path .. pl_path.sep)
+  local new_file = vim.fn.input("Create file/directory: " .. dir_path .. require "pl.path".sep)
   vim.api.nvim_command("normal :esc<CR>")
   if new_file == nil or #new_file == 0 then
     return
   end
-  new_file = pl_path.join(dir_path, new_file)
-  if string.sub(new_file, -string.len(pl_path.sep)) == pl_path.sep then
-    local success, msg = pl_dir.makepath(new_file)
+  new_file = require "pl.path".join(dir_path, new_file)
+  if string.sub(new_file, -string.len(require "pl.path".sep)) == require "pl.path".sep then
+    local success, msg = require "pl.dir".makepath(new_file)
     if not success then
       vim.api.nvim_err_writeln(msg)
       return
     end
   else
-    dir_path = pl_path.dirname(new_file)
-    if not pl_path.exists(dir_path) then
-      local success, msg = pl_dir.makepath(dir_path)
+    dir_path = require "pl.path".dirname(new_file)
+    if not require "pl.path".exists(dir_path) then
+      local success, msg = require "pl.dir".makepath(dir_path)
       if not success then
         vim.api.nvim_err_writeln(msg)
         return
       end
     end
-    local success, msg = pl_file.write(new_file, "", false)
+    local success, msg = require "pl.file".write(new_file, "", false)
     if not success then
       vim.api.nvim_err_writeln(msg)
       return
@@ -656,15 +652,17 @@ local function delete_file()
   if res ~= "Y" then
     return
   end
-  if pl_path.isdir(item.path) then
-    local success, msg, code = pl_path.rmdir(item.path)
+  if require "pl.path".isdir(item.path) then
+    local success, msg, code = require "pl.path".rmdir(item.path)
     if not success then
       if code == 66 then
         res =
-          vim.fn.input(pl_path.basename(item.path) .. " not empty. Are you sure to delete all self files" .. " ? Y/n: ")
+          vim.fn.input(
+          require "pl.path".basename(item.path) .. " not empty. Are you sure to delete all self files" .. " ? Y/n: "
+        )
         vim.api.nvim_command("normal :esc<CR>")
         if res == "Y" then
-          success, msg = pl_dir.rmtree(item.path)
+          success, msg = require "pl.dir".rmtree(item.path)
           if not success then
             vim.api.nvim_err_writeln(msg)
             return
@@ -676,7 +674,7 @@ local function delete_file()
       end
     end
   else
-    local success, msg = pl_file.delete(item.path)
+    local success, msg = require "pl.file".delete(item.path)
     if not success then
       vim.api.nvim_err_writeln(msg)
       return
@@ -704,7 +702,7 @@ local function rename_file()
 end
 
 local function copy_name()
-  copy_to_system_clipboard(pl_path.basename(win_get_cursor_row().path))
+  copy_to_system_clipboard(require "pl.path".basename(win_get_cursor_row().path))
 end
 
 local function copy_file_path()

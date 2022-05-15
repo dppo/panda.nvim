@@ -115,7 +115,7 @@ local function VIMode(is_cur)
   if is_cur ~= true and is_inactive_mode("vimode") then
     return ""
   end
-  return "%#PandaLineViMode# " .. [[%{luaeval('require("pandaline").mode_name()')}]] .. " %##"
+  return "%#PandaLineViMode# " .. [[%{luaeval('require("panda.pandaline").mode_name()')}]] .. " %##"
 end
 
 local function SpaceFill()
