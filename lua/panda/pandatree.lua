@@ -764,16 +764,6 @@ local function create_pandatree_augroup()
       callback = function()
         win_check_auto_close()
         win_prevent_other_bufs_enter()
-        win_keep_tree_size()
-      end
-    }
-  )
-  vim.api.nvim_create_autocmd(
-    {"VimResized"},
-    {
-      group = au_group,
-      callback = function()
-        win_keep_tree_size()
       end
     }
   )
@@ -785,6 +775,13 @@ local function create_pandatree_augroup()
         draw_tree()
       end
     }
+  )
+  vim.api.nvim_create_user_command(
+    "WinStatusChanged",
+    function()
+      win_keep_tree_size()
+    end,
+    {}
   )
 end
 

@@ -201,6 +201,11 @@ local function FileEncoding(win, is_cur)
   return "%#PandaLineEncoding# %{&fileencoding} %##"
 end
 
+local function win_status_changed_event()
+  vim.cmd("WinStatusChanged")
+  return ""
+end
+
 local function load_win_statusline(win, is_cur)
   local status_line = VIMode(is_cur)
   if full_opts.git.enable == true then
@@ -213,6 +218,8 @@ local function load_win_statusline(win, is_cur)
   status_line = status_line .. FileEncoding(win, is_cur)
   status_line = status_line .. LinePercent(win, is_cur)
   status_line = status_line .. CursorLocation(win, is_cur)
+  -- listen win change
+  status_line = status_line .. [[%{luaeval('require("panda.pandaline").win_status_changed_event()')}]]
   vim.api.nvim_win_set_option(win, "statusline", status_line)
 end
 
@@ -232,6 +239,12 @@ local function pandaline_augroup()
         load_wins_statusline()
       end
     }
+  )
+  vim.api.nvim_create_user_command(
+    "WinStatusChanged",
+    function()
+    end,
+    {}
   )
 end
 
@@ -314,6 +327,7 @@ end
 
 return {
   mode_name = mode_name,
+  win_status_changed_event = win_status_changed_event,
   choose_win = choose_win,
   choose_specify_windows = choose_specify_windows,
   setup = setup
