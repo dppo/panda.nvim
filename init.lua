@@ -36,9 +36,6 @@ require("packer").startup {
     }
     use "kyazdani42/nvim-web-devicons"
     use "easymotion/vim-easymotion"
-    use "lukas-reineke/indent-blankline.nvim"
-    use "dstein64/nvim-scrollview"
-    use "rcarriga/nvim-notify"
     use "mhartington/formatter.nvim"
     use "preservim/nerdcommenter"
     use {
@@ -48,9 +45,16 @@ require("packer").startup {
       end
     }
     use {
-      "nvim-telescope/telescope.nvim",
-      requires = {{"nvim-lua/plenary.nvim"}}
+      "ojroques/nvim-lspfuzzy",
+      requires = {
+        {"junegunn/fzf"},
+        {"junegunn/fzf.vim"}
+      }
     }
+    use "lukas-reineke/indent-blankline.nvim"
+    use "dstein64/nvim-scrollview"
+    use "rcarriga/nvim-notify"
+    use {"norcalli/nvim-colorizer.lua"}
     use_rocks {"luafilesystem", "luautf8", "penlight"}
   end,
   config = {

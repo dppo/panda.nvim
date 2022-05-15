@@ -99,6 +99,16 @@ _G.packer_plugins = {
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/formatter.nvim",
     url = "https://github.com/mhartington/formatter.nvim"
   },
+  fzf = {
+    loaded = true,
+    path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/fzf",
+    url = "https://github.com/junegunn/fzf"
+  },
+  ["fzf.vim"] = {
+    loaded = true,
+    path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/fzf.vim",
+    url = "https://github.com/junegunn/fzf.vim"
+  },
   ["gitsigns.nvim"] = {
     config = { "\27LJ\2\n6\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\rgitsigns\frequire\0" },
     loaded = true,
@@ -125,6 +135,11 @@ _G.packer_plugins = {
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/nvim-cmp",
     url = "https://github.com/hrsh7th/nvim-cmp"
   },
+  ["nvim-colorizer.lua"] = {
+    loaded = true,
+    path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/nvim-colorizer.lua",
+    url = "https://github.com/norcalli/nvim-colorizer.lua"
+  },
   ["nvim-lsp-installer"] = {
     loaded = true,
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/nvim-lsp-installer",
@@ -134,6 +149,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/nvim-lspconfig",
     url = "https://github.com/neovim/nvim-lspconfig"
+  },
+  ["nvim-lspfuzzy"] = {
+    loaded = true,
+    path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/nvim-lspfuzzy",
+    url = "https://github.com/ojroques/nvim-lspfuzzy"
   },
   ["nvim-notify"] = {
     loaded = true,
@@ -169,16 +189,6 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/packer.nvim",
     url = "https://github.com/wbthomason/packer.nvim"
-  },
-  ["plenary.nvim"] = {
-    loaded = true,
-    path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/plenary.nvim",
-    url = "https://github.com/nvim-lua/plenary.nvim"
-  },
-  ["telescope.nvim"] = {
-    loaded = true,
-    path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/telescope.nvim",
-    url = "https://github.com/nvim-telescope/telescope.nvim"
   },
   ["vim-easymotion"] = {
     loaded = true,

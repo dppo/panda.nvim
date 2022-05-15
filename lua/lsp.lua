@@ -2,11 +2,10 @@ local lspinstaller = require "nvim-lsp-installer"
 local lspconfig = require("lspconfig")
 
 local on_attach = function(_, bufnr)
-  local opts = {noremap = true, silent = true}
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", ":lua require('telescope.builtin').lsp_definitions()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "<space>rn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>cf', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+  local opts = {buffer = bufnr, noremap = true, silent = true}
+  vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+  vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+  vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
 end
 
 local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())

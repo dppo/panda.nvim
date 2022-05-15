@@ -35,6 +35,35 @@ require "nvim-treesitter.configs".setup {
   }
 }
 
+-- fzf
+require("lspfuzzy").setup {
+  methods = "all",
+  jump_one = true,
+  save_last = true,
+  callback = nil,
+  fzf_preview = {
+    "right:+{2}-/2"
+  },
+  fzf_action = {
+    ["ctrl-t"] = "tab split",
+    ["ctrl-v"] = "vsplit",
+    ["ctrl-x"] = "split"
+  },
+  fzf_modifier = ":~:.",
+  fzf_trim = true
+}
+
+-- colorizer
+require "colorizer".setup(
+  {"*"},
+  {
+    RGB = true,
+    RRGGBB = true,
+    names = true,
+    RRGGBBAA = true
+  }
+)
+
 require("format")
 require("notice")
 require("completion")
