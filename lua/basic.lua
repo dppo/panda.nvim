@@ -25,6 +25,33 @@ vim.o.syntax = "on"
 vim.o.termguicolors = true
 vim.cmd "colorscheme onedark"
 
+local system_group = vim.api.nvim_create_augroup("SystemGroup", {clear = true})
+-- 取消换行自动注释
+vim.api.nvim_create_autocmd(
+  "FileType",
+  {
+    group = system_group,
+    callback = function()
+      vim.cmd [[setlocal formatoptions-=c formatoptions-=r formatoptions-=o]]
+    end
+  }
+)
+
+-- 默认垂直方向打开help
+vim.api.nvim_create_autocmd(
+  "BufWinEnter",
+  {
+    pattern = {"*.txt"},
+    group = system_group,
+    callback = function()
+      local filetype = vim.api.nvim_buf_get_option(vim.api.nvim_get_current_buf(), "filetype")
+      if filetype == "help" then
+        vim.api.nvim_command("wincmd L")
+      end
+    end
+  }
+)
+
 local function load_basic_theme()
   -- system
   vim.cmd [[hi Normal guibg=NONE ctermbg=NONE]]
@@ -38,7 +65,7 @@ end
 vim.api.nvim_create_autocmd(
   "ColorScheme",
   {
-    group = vim.api.nvim_create_augroup("BasicTheme", {clear = true}),
+    group = system_group,
     callback = function()
       load_basic_theme()
     end

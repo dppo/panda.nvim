@@ -36,6 +36,13 @@ require "nvim-treesitter.configs".setup {
 }
 
 -- fzf
+vim.g.fzf_layout = {
+  window = {
+    width = 0.7,
+    height = 0.9
+  }
+}
+
 require("lspfuzzy").setup {
   methods = "all",
   jump_one = true,
