@@ -199,6 +199,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/vim-easymotion",
     url = "https://github.com/easymotion/vim-easymotion"
+  },
+  ["vim-visual-star-search"] = {
+    loaded = true,
+    path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/vim-visual-star-search",
+    url = "https://github.com/bronson/vim-visual-star-search"
   }
 }
 

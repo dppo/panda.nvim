@@ -51,6 +51,7 @@ require("packer").startup {
         {"junegunn/fzf.vim"}
       }
     }
+    use "bronson/vim-visual-star-search"
     use "lukas-reineke/indent-blankline.nvim"
     use "dstein64/nvim-scrollview"
     use "rcarriga/nvim-notify"
