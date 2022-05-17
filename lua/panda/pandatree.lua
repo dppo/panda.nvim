@@ -202,12 +202,12 @@ local function buf_set_keymap(buf)
     ["<C-y>"] = "copy_file_path"
   }
   for k, v in pairs(mappings) do
-    vim.api.nvim_buf_set_keymap(
-      buf,
+    vim.keymap.set(
       "n",
       k,
       ":lua require'panda.pandatree'." .. v .. "()<cr>",
       {
+        buffer = buf,
         nowait = true,
         silent = true,
         noremap = true
@@ -747,7 +747,6 @@ local function win_keep_tree_size()
 end
 
 local function win_keep_tree_cursor()
-  vim.pretty_print("win_keep_tree_cursor")
   local location = vim.api.nvim_win_get_cursor(0)
   if location[2] ~= 0 then
     vim.api.nvim_win_set_cursor(0, {location[1], 0})

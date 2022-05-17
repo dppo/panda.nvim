@@ -1,3 +1,19 @@
+vim.keymap.set(
+  "v",
+  "*",
+  function()
+    local s_start = vim.fn.getpos("'<")
+    local s_end = vim.fn.getpos("'>")
+    vim.pretty_print(s_start)
+    vim.pretty_print(s_end)
+  end,
+  {
+    nowait = true,
+    silent = true,
+    noremap = true
+  }
+)
+
 --Remap space as leader key
 vim.keymap.set({"n", "v"}, "<Space>", "<Nop>", {silent = true})
 vim.g.mapleader = " "

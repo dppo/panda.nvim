@@ -25,33 +25,6 @@ vim.o.syntax = "on"
 vim.o.termguicolors = true
 vim.cmd "colorscheme onedark"
 
-local system_group = vim.api.nvim_create_augroup("SystemGroup", {clear = true})
--- 取消换行自动注释
-vim.api.nvim_create_autocmd(
-  "FileType",
-  {
-    group = system_group,
-    callback = function()
-      vim.cmd [[setlocal formatoptions-=c formatoptions-=r formatoptions-=o]]
-    end
-  }
-)
-
--- 默认垂直方向打开help
-vim.api.nvim_create_autocmd(
-  "BufWinEnter",
-  {
-    pattern = {"*.txt"},
-    group = system_group,
-    callback = function()
-      local filetype = vim.api.nvim_buf_get_option(vim.api.nvim_get_current_buf(), "filetype")
-      if filetype == "help" then
-        vim.api.nvim_command("wincmd L")
-      end
-    end
-  }
-)
-
 local function load_basic_theme()
   -- system
   vim.cmd [[hi Normal guibg=NONE ctermbg=NONE]]
@@ -61,7 +34,10 @@ local function load_basic_theme()
   -- ScrollView
   vim.cmd [[hi ScrollView guibg=#FFFFFF]]
 end
+-- first refresh theme
+load_basic_theme()
 
+local system_group = vim.api.nvim_create_augroup("SystemGroup", {clear = true})
 vim.api.nvim_create_autocmd(
   "ColorScheme",
   {
@@ -71,34 +47,72 @@ vim.api.nvim_create_autocmd(
     end
   }
 )
--- first refresh theme
-load_basic_theme()
 
--- Highlight on yank
-local highlight_group = vim.api.nvim_create_augroup("YankHighlight", {clear = true})
+-- don't auto comment new line
 vim.api.nvim_create_autocmd(
-  "TextYankPost",
+  "FileType",
   {
+    group = system_group,
     callback = function()
-      vim.highlight.on_yank()
-    end,
-    group = highlight_group,
-    pattern = "*"
+      vim.cmd [[setlocal formatoptions-=cro]]
+    end
+  }
+)
+
+-- vertical open help
+vim.api.nvim_create_autocmd(
+  "BufWinEnter",
+  {
+    group = system_group,
+    pattern = {"*.txt"},
+    callback = function()
+      local filetype = vim.api.nvim_buf_get_option(vim.api.nvim_get_current_buf(), "filetype")
+      if filetype == "help" then
+        vim.api.nvim_command("wincmd L")
+      end
+    end
   }
 )
 
 -- go to last loc when opening a buffer
 vim.api.nvim_create_autocmd(
   "BufReadPost",
-  {command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif]]}
+  {
+    group = system_group,
+    command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif]]
+  }
 )
 
 -- show cursor line only in active window
-local cursorGrp = vim.api.nvim_create_augroup("CursorLine", {clear = true})
-vim.api.nvim_create_autocmd({"InsertLeave", "WinEnter"}, {pattern = "*", command = "set cursorline", group = cursorGrp})
+local cursor_group = vim.api.nvim_create_augroup("CursorLine", {clear = true})
+vim.api.nvim_create_autocmd(
+  {"InsertLeave", "WinEnter"},
+  {
+    group = cursor_group,
+    pattern = "*",
+    command = "set cursorline"
+  }
+)
 vim.api.nvim_create_autocmd(
   {"InsertEnter", "WinLeave"},
-  {pattern = "*", command = "set nocursorline", group = cursorGrp}
+  {
+    group = cursor_group,
+    pattern = "*",
+    command = "set nocursorline"
+  }
+)
+
+-- Highlight on yank
+local highlight_group = vim.api.nvim_create_augroup("YankHighlight", {clear = true})
+vim.api.nvim_create_autocmd(
+  "TextYankPost",
+  {
+    group = highlight_group,
+    pattern = "*",
+    callback = function()
+      vim.highlight.on_yank()
+    end
+  }
 )
 
 -- scrollview
