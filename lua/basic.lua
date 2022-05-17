@@ -87,6 +87,20 @@ vim.api.nvim_create_autocmd(
   }
 )
 
+-- go to last loc when opening a buffer
+vim.api.nvim_create_autocmd(
+  "BufReadPost",
+  {command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif]]}
+)
+
+-- show cursor line only in active window
+local cursorGrp = vim.api.nvim_create_augroup("CursorLine", {clear = true})
+vim.api.nvim_create_autocmd({"InsertLeave", "WinEnter"}, {pattern = "*", command = "set cursorline", group = cursorGrp})
+vim.api.nvim_create_autocmd(
+  {"InsertEnter", "WinLeave"},
+  {pattern = "*", command = "set nocursorline", group = cursorGrp}
+)
+
 -- scrollview
 require("scrollview").setup(
   {

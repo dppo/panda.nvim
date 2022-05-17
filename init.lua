@@ -55,6 +55,15 @@ require("packer").startup {
     use "dstein64/nvim-scrollview"
     use "rcarriga/nvim-notify"
     use {"norcalli/nvim-colorizer.lua"}
+    use(
+      {
+        "iamcco/markdown-preview.nvim",
+        run = function()
+          vim.fn["mkdp#util#install"]()
+        end
+      }
+    )
+
     use_rocks {"luafilesystem", "luautf8", "penlight"}
   end,
   config = {

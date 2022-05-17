@@ -746,6 +746,16 @@ local function win_keep_tree_size()
   end
 end
 
+local function win_keep_tree_cursor()
+  vim.pretty_print("win_keep_tree_cursor")
+  local location = vim.api.nvim_win_get_cursor(0)
+  if location[2] ~= 0 then
+    vim.api.nvim_win_set_cursor(0, {location[1], 0})
+    -- TODO 使用EasyMotionPromptEnd替换直接刷新
+    draw_tree()
+  end
+end
+
 local function create_pandatree_augroup()
   local au_group = vim.api.nvim_create_augroup("PandaTree", {clear = true})
   vim.api.nvim_create_autocmd(
@@ -773,6 +783,16 @@ local function create_pandatree_augroup()
       group = au_group,
       callback = function()
         draw_tree()
+      end
+    }
+  )
+  vim.api.nvim_create_autocmd(
+    {"CursorMoved"},
+    {
+      group = au_group,
+      buffer = panda_tree_buf(),
+      callback = function()
+        win_keep_tree_cursor()
       end
     }
   )

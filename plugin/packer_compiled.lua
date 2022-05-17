@@ -120,6 +120,11 @@ _G.packer_plugins = {
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/indent-blankline.nvim",
     url = "https://github.com/lukas-reineke/indent-blankline.nvim"
   },
+  ["markdown-preview.nvim"] = {
+    loaded = true,
+    path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/markdown-preview.nvim",
+    url = "https://github.com/iamcco/markdown-preview.nvim"
+  },
   nerdcommenter = {
     loaded = true,
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/nerdcommenter",
