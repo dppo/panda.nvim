@@ -23,3 +23,20 @@ vim.keymap.set("x", "<leader>fw", 'y:Rg <C-R>"<CR>')
 vim.keymap.set("n", "<leader>fb", "<cmd>Buffers<CR>")
 vim.keymap.set("n", "<leader>fh", "<cmd>History<CR>")
 vim.keymap.set("n", "<leader>fg", "<cmd>GFiles?<CR>")
+
+vim.keymap.set(
+  "v",
+  "<leader>y",
+  function()
+    vim.cmd('noau normal! "vy"')
+    local content = vim.fn.getreg("v")
+    vim.fn.setreg("+", content)
+    vim.fn.setreg('"', content)
+    vim.api.nvim_out_write("Copied to system clipboard! \n")
+  end,
+  {
+    nowait = true,
+    silent = true,
+    noremap = true
+  }
+)
