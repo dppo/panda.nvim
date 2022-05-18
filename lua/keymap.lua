@@ -19,8 +19,25 @@ vim.keymap.set("n", "<leader>e", require("panda.pandatree").togger_tree)
 vim.keymap.set("n", "<leader>w", require("panda.pandaline").choose_win)
 vim.keymap.set("n", "<leader>ss", "<Plug>(easymotion-s2)")
 vim.keymap.set("n", "<leader>cf", require("format").format)
-vim.keymap.set({"n", "v"}, "<leader>cc", "<Plug>NERDCommenterToggle")
-vim.keymap.set({"n", "v"}, "<leader>cm", "<Plug>NERDCommenterMinimal")
+
+-- comment
+local opt = {expr = true, remap = true}
+-- Toggle using count
+vim.keymap.set(
+  "n",
+  "<leader>cc",
+  "v:count == 0 ? '<Plug>(comment_toggle_current_linewise)' : '<Plug>(comment_toggle_linewise_count)'",
+  opt
+)
+vim.keymap.set(
+  "n",
+  "<leader>cm",
+  "v:count == 0 ? '<Plug>(comment_toggle_current_blockwise)' : '<Plug>(comment_toggle_blockwise_count)'",
+  opt
+)
+-- Toggle in VISUAL mode
+vim.keymap.set("x", "<leader>cc", "<Plug>(comment_toggle_linewise_visual)")
+vim.keymap.set("x", "<leader>cm", "<Plug>(comment_toggle_blockwise_visual)")
 
 -- gitsign
 vim.keymap.set("n", "<leader>gi", "<cmd>Gitsigns preview_hunk<CR>")

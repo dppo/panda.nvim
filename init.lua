@@ -9,7 +9,7 @@ end
 
 require("packer").startup {
   function(use, use_rocks)
-    use {"wbthomason/packer.nvim"}
+    use "wbthomason/packer.nvim"
     use "joshdick/onedark.vim"
     use {
       "williamboman/nvim-lsp-installer",
@@ -21,7 +21,10 @@ require("packer").startup {
     use {
       "nvim-treesitter/nvim-treesitter",
       run = ":TSUpdate",
-      requires = {"windwp/nvim-ts-autotag"}
+      requires = {
+        "windwp/nvim-ts-autotag",
+        "JoosepAlviste/nvim-ts-context-commentstring"
+      }
     }
     use {
       "hrsh7th/nvim-cmp",
@@ -37,6 +40,7 @@ require("packer").startup {
     use "kyazdani42/nvim-web-devicons"
     use "easymotion/vim-easymotion"
     use "mhartington/formatter.nvim"
+    use "numToStr/Comment.nvim"
     use "preservim/nerdcommenter"
     use {
       "lewis6991/gitsigns.nvim",
@@ -56,14 +60,12 @@ require("packer").startup {
     use "dstein64/nvim-scrollview"
     use "rcarriga/nvim-notify"
     use {"norcalli/nvim-colorizer.lua"}
-    use(
-      {
-        "iamcco/markdown-preview.nvim",
-        run = function()
-          vim.fn["mkdp#util#install"]()
-        end
-      }
-    )
+    use {
+      "iamcco/markdown-preview.nvim",
+      run = function()
+        vim.fn["mkdp#util#install"]()
+      end
+    }
 
     use_rocks {"luafilesystem", "luautf8", "penlight"}
   end,
