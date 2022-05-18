@@ -744,6 +744,11 @@ local function win_keep_tree_size()
   if tree_win ~= nil and vim.api.nvim_win_get_width(tree_win) ~= full_opts.win_width then
     vim.api.nvim_win_set_width(tree_win, full_opts.win_width)
   end
+
+  local wins = vim.api.nvim_list_wins()
+  if tree_win ~= nil and tree_win ~= wins[1] then
+    vim.api.nvim_command("wincmd L")
+  end
 end
 
 local function win_keep_tree_cursor()

@@ -71,6 +71,21 @@ vim.keymap.set(
 
 -- copy to system clipboard
 vim.keymap.set(
+  "n",
+  "<leader>y",
+  function()
+    local content = vim.call("expand", "<cword>")
+    vim.fn.setreg("+", content)
+    vim.fn.setreg('"', content)
+    vim.api.nvim_out_write("Copied to system clipboard! \n")
+  end,
+  {
+    nowait = true,
+    silent = true,
+    noremap = true
+  }
+)
+vim.keymap.set(
   "v",
   "<leader>y",
   function()
