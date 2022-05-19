@@ -15,6 +15,17 @@ vim.g.NERDCustomDelimiters = {
   }
 }
 
+-- Gitsigns
+require("gitsigns").setup {
+  signs = {
+    add = {text = "+"},
+    change = {text = "~"},
+    delete = {text = "_"},
+    topdelete = {text = "‾"},
+    changedelete = {text = "~"}
+  }
+}
+
 -- Indent blankline
 require("indent_blankline").setup {
   char = "┊"
@@ -103,7 +114,33 @@ require("Comment").setup(
   }
 )
 
+-- term
+require("toggleterm").setup {
+  open_mapping = [[<leader>tt]],
+  on_open = function(term)
+    vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<esc>", "<cmd>ToggleTerm<CR>", {silent = false, noremap = true})
+    if vim.fn.mapcheck("<leader>tt", "t") ~= "" then
+      vim.api.nvim_buf_del_keymap(term.bufnr, "t", "<leader>tt")
+    end
+  end,
+  highlights = {
+    FloatBorder = {
+      link = "Comment"
+    }
+  },
+  insert_mappings = false,
+  direction = "float",
+  float_opts = {
+    border = "curved",
+    width = function()
+      return math.floor(vim.o.columns * 0.68)
+    end,
+    height = function()
+      return math.floor(vim.o.lines * 0.86)
+    end
+  }
+}
+
 require("format")
 require("notice")
 require("completion")
-require("git")

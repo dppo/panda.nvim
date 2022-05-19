@@ -42,12 +42,7 @@ require("packer").startup {
     use "mhartington/formatter.nvim"
     use "numToStr/Comment.nvim"
     use "preservim/nerdcommenter"
-    use {
-      "lewis6991/gitsigns.nvim",
-      config = function()
-        require("gitsigns").setup()
-      end
-    }
+    use "lewis6991/gitsigns.nvim"
     use {
       "ojroques/nvim-lspfuzzy",
       requires = {
@@ -66,6 +61,7 @@ require("packer").startup {
         vim.fn["mkdp#util#install"]()
       end
     }
+    use "akinsho/toggleterm.nvim"
 
     use_rocks {"luafilesystem", "luautf8", "penlight"}
   end,
