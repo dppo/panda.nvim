@@ -40,6 +40,18 @@ require("indent_blankline").setup {
   }
 }
 
+-- scrollview
+require("scrollview").setup(
+  {
+    excluded_filetypes = {"PandaTree", "startify"},
+    current_only = true
+  }
+)
+
+-- startify
+vim.g.startify_change_to_dir = 0
+vim.g.startify_change_to_vcs_root = 1
+
 -- treesitter
 require "nvim-treesitter.configs".setup {
   ensure_installed = "all",
@@ -131,6 +143,9 @@ require("toggleterm").setup {
     if vim.fn.mapcheck("<leader>tt", "t") ~= "" then
       vim.keymap.del("t", "<leader>tt", {buffer = term.bufnr})
     end
+  end,
+  on_close = function()
+    require("panda.pandatree").draw_tree()
   end,
   highlights = {
     FloatBorder = {

@@ -1,4 +1,8 @@
 local full_opts = {
+  auto_open = {
+    enable = true,
+    min_width = 150
+  },
   icon_enable = true,
   win_width = 31,
   tree_name = "PandaTree",
@@ -462,7 +466,14 @@ local function load_git_status()
           for _, icon in pairs(git_status_icon) do
             local icon_key = icon
             if require "pl.path".isdir(tmp_path) and icon_key ~= "Default" then
-              icon_key = "Modified"
+              local tmp_icon_key = tmp_path .. "_key"
+              local save_icon_key = tmp_data.gitStatus[tmp_icon_key]
+              if save_icon_key ~= "Modified" and icon_key == "Staged" then
+                icon_key = "Staged"
+              else
+                icon_key = "Modified"
+              end
+              tmp_data.gitStatus[tmp_icon_key] = icon_key
             end
             show_git_status = show_git_status .. full_opts.git.icon[icon_key]
           end
@@ -755,8 +766,6 @@ local function win_keep_tree_cursor()
   local location = vim.api.nvim_win_get_cursor(0)
   if location[2] ~= 0 then
     vim.api.nvim_win_set_cursor(0, {location[1], 0})
-    -- TODO 使用EasyMotionPromptEnd替换直接刷新
-    draw_tree()
   end
 end
 
@@ -800,13 +809,39 @@ local function create_pandatree_augroup()
       end
     }
   )
-  vim.api.nvim_create_user_command(
-    "WinStatusChanged",
-    function()
-      win_keep_tree_size()
-    end,
-    {}
+  vim.api.nvim_create_autocmd(
+    "User",
+    {
+      pattern = "EasyMotionPromptEnd",
+      callback = function()
+        draw_tree()
+      end
+    }
   )
+  vim.api.nvim_create_autocmd(
+    "User",
+    {
+      pattern = "WinStatusChanged",
+      callback = function()
+        win_keep_tree_size()
+      end
+    }
+  )
+  if full_opts.auto_open.enable then
+    vim.api.nvim_create_autocmd(
+      "User",
+      {
+        pattern = "Startified",
+        callback = function()
+          if vim.api.nvim_win_get_width(0) >= full_opts.auto_open.min_width then
+            require "panda.pandatree".togger_tree()
+            vim.api.nvim_command("set nocursorline")
+            vim.api.nvim_command("wincmd l")
+          end
+        end
+      }
+    )
+  end
 end
 
 local setup = function(opts)
@@ -833,6 +868,15 @@ local togger_tree = function()
   end
 end
 
+local function jump_to_tree_win()
+  local tree_win = tabpage_tree_win()
+  if tree_win == nil then
+    togger_tree()
+  else
+    vim.api.nvim_set_current_win(tree_win)
+  end
+end
+
 return {
   togger_tree = togger_tree,
   setup = setup,
@@ -847,5 +891,6 @@ return {
   delete_file = delete_file,
   rename_file = rename_file,
   copy_name = copy_name,
-  copy_file_path = copy_file_path
+  copy_file_path = copy_file_path,
+  jump_to_tree_win = jump_to_tree_win
 }

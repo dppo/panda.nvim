@@ -15,7 +15,8 @@ vim.keymap.set({"n", "v"}, "<Space>", "<Nop>", {silent = true})
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-vim.keymap.set("n", "<leader>e", require("panda.pandatree").togger_tree)
+vim.keymap.set("n", "<leader>l", require("panda.pandatree").togger_tree)
+vim.keymap.set("n", "<leader>e", require("panda.pandatree").jump_to_tree_win)
 vim.keymap.set("n", "<leader>w", require("panda.pandaline").choose_win)
 vim.keymap.set("n", "<leader>ss", "<Plug>(easymotion-s2)")
 vim.keymap.set("n", "<leader>cf", require("format").format)

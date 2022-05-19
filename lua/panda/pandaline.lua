@@ -202,7 +202,7 @@ local function FileEncoding(win, is_cur)
 end
 
 local function win_status_changed_event()
-  vim.cmd("WinStatusChanged")
+  vim.api.nvim_command("doautocmd User WinStatusChanged")
   return ""
 end
 
@@ -239,12 +239,6 @@ local function pandaline_augroup()
         load_wins_statusline()
       end
     }
-  )
-  vim.api.nvim_create_user_command(
-    "WinStatusChanged",
-    function()
-    end,
-    {}
   )
 end
 

@@ -114,11 +114,3 @@ vim.api.nvim_create_autocmd(
     end
   }
 )
-
--- scrollview
-require("scrollview").setup(
-  {
-    excluded_filetypes = {"PandaTree"},
-    current_only = true
-  }
-)
