@@ -50,7 +50,8 @@ vim.keymap.set("n", "<leader>ff", "<cmd>Files<CR>")
 vim.keymap.set("n", "<leader>fa", "<cmd>RG<CR>")
 vim.keymap.set("n", "<leader>fb", "<cmd>Buffers<CR>")
 vim.keymap.set("n", "<leader>fh", "<cmd>History<CR>")
-vim.keymap.set("n", "<leader>fg", "<cmd>GFiles?<CR>")
+vim.keymap.set("n", "<leader>fg", "<cmd>GFiles<CR>")
+vim.keymap.set("n", "<leader>fm", "<cmd>GFiles?<CR>")
 vim.keymap.set(
   "v",
   "<leader>fa",
@@ -68,6 +69,9 @@ vim.keymap.set(
     vim.api.nvim_command("RG " .. current_word)
   end
 )
+
+-- term
+vim.keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<CR>", {silent = false, noremap = true})
 
 -- copy to system clipboard
 vim.keymap.set(

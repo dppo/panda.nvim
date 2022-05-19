@@ -62,6 +62,7 @@ require("packer").startup {
       end
     }
     use "akinsho/toggleterm.nvim"
+    use "mhinz/vim-startify"
 
     use_rocks {"luafilesystem", "luautf8", "penlight"}
   end,

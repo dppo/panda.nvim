@@ -28,7 +28,16 @@ require("gitsigns").setup {
 
 -- Indent blankline
 require("indent_blankline").setup {
-  char = "┊"
+  char = "┊",
+  filetype_exclude = {
+    "lspinfo",
+    "packer",
+    "checkhealth",
+    "help",
+    "man",
+    "",
+    "startify"
+  }
 }
 
 -- treesitter
@@ -116,11 +125,11 @@ require("Comment").setup(
 
 -- term
 require("toggleterm").setup {
-  open_mapping = [[<leader>tt]],
+  open_mapping = nil,
   on_open = function(term)
-    vim.api.nvim_buf_set_keymap(term.bufnr, "t", "<esc>", "<cmd>ToggleTerm<CR>", {silent = false, noremap = true})
+    vim.keymap.set("t", "<esc>", "<cmd>ToggleTerm<CR>", {silent = false, noremap = true, buffer = term.bufnr})
     if vim.fn.mapcheck("<leader>tt", "t") ~= "" then
-      vim.api.nvim_buf_del_keymap(term.bufnr, "t", "<leader>tt")
+      vim.keymap.del("t", "<leader>tt", {buffer = term.bufnr})
     end
   end,
   highlights = {
