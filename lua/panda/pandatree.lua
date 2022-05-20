@@ -147,7 +147,8 @@ local tmp_data = {
   showHidden = true,
   openTree = {},
   tree = {},
-  gitStatus = {}
+  gitStatus = {},
+  waitingCursorMoved = false
 }
 
 local function copy_to_system_clipboard(content)
@@ -207,7 +208,11 @@ local function buf_set_keymap(buf)
     ["<C-a>"] = "add_file",
     ["<C-d>"] = "delete_file",
     ["<C-r>"] = "rename_file",
-    ["<C-y>"] = "copy_file_path"
+    ["<C-y>"] = "copy_file_path",
+    ["<Left>"] = "move_left_cursor",
+    ["<Up>"] = "move_left_cursor",
+    ["<Right>"] = "move_right_cursor",
+    ["<Down>"] = "move_right_cursor"
   }
   for k, v in pairs(mappings) do
     vim.keymap.set(
@@ -774,11 +779,22 @@ local function win_keep_tree_size()
   end
 end
 
+local function move_left_cursor()
+  local location = vim.api.nvim_win_get_cursor(0)
+  vim.api.nvim_win_set_cursor(0, {math.max(1, location[1] - 1), 0})
+end
+
+local function move_right_cursor()
+  local location = vim.api.nvim_win_get_cursor(0)
+  vim.api.nvim_win_set_cursor(0, {math.min(vim.api.nvim_buf_line_count(0), location[1] + 1), 0})
+end
+
 local function win_keep_tree_cursor()
   local location = vim.api.nvim_win_get_cursor(0)
-  if location[2] ~= 0 then
+  if location[2] ~= 0 and tmp_data.waitingCursorMoved then
     vim.api.nvim_win_set_cursor(0, {location[1], 0})
   end
+  tmp_data.waitingCursorMoved = false
 end
 
 local function create_pandatree_augroup()
@@ -827,6 +843,7 @@ local function create_pandatree_augroup()
       pattern = "EasyMotionPromptEnd",
       callback = function()
         draw_tree()
+        tmp_data.waitingCursorMoved = true
       end
     }
   )
@@ -905,5 +922,7 @@ return {
   rename_file = rename_file,
   copy_name = copy_name,
   copy_file_path = copy_file_path,
-  jump_to_tree_win = jump_to_tree_win
+  jump_to_tree_win = jump_to_tree_win,
+  move_left_cursor = move_left_cursor,
+  move_right_cursor = move_right_cursor
 }

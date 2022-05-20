@@ -11,3 +11,4 @@
 10. tree git状态添加颜色展示
 11. ~~添加DiffView~~
 12. tree不能继续搜索bug
+13. 高亮当前word
