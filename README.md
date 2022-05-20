@@ -9,4 +9,4 @@
 8. ~~根据win宽度自动检测打开tree~~
 9. ~~tree文件夹git状态优化，显示暂存状态~~
 10. tree git状态添加颜色展示
-11. 添加DiffView
+11. ~~添加DiffView~~

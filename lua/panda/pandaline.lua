@@ -324,5 +324,6 @@ return {
   win_status_changed_event = win_status_changed_event,
   choose_win = choose_win,
   choose_specify_windows = choose_specify_windows,
+  load_wins_statusline = load_wins_statusline,
   setup = setup
 }

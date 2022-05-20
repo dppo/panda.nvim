@@ -74,6 +74,10 @@ vim.keymap.set(
 -- term
 vim.keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<CR>", {silent = false, noremap = true})
 
+-- diffview
+vim.keymap.set("n", "<leader>dv", "<cmd>DiffviewOpen<CR>", {silent = false, noremap = true})
+vim.keymap.set("n", "<leader>dh", "<cmd>DiffviewFileHistory<CR>", {silent = false, noremap = true})
+
 -- copy to system clipboard
 vim.keymap.set(
   "n",

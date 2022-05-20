@@ -837,6 +837,7 @@ local function create_pandatree_augroup()
             require "panda.pandatree".togger_tree()
             vim.api.nvim_command("set nocursorline")
             vim.api.nvim_command("wincmd l")
+            require "panda.pandaline".load_wins_statusline()
           end
         end
       }

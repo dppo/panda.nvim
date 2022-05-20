@@ -165,6 +165,24 @@ require("toggleterm").setup {
   }
 }
 
+-- diffview
+require "diffview".setup {
+  key_bindings = {
+    view = {
+      ["<esc>"] = "<cmd>DiffviewClose<CR>"
+    },
+    file_panel = {
+      ["<esc>"] = "<cmd>DiffviewClose<CR>"
+    },
+    file_history_panel = {
+      ["<esc>"] = "<cmd>DiffviewClose<CR>"
+    },
+    option_panel = {
+      ["<esc>"] = "<cmd>DiffviewClose<CR>"
+    }
+  }
+}
+
 require("format")
 require("notice")
 require("completion")
