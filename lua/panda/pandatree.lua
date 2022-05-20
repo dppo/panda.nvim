@@ -29,6 +29,9 @@ local full_opts = {
     spell = false,
     wrap = false
   },
+  special_files = {
+    "README.md"
+  },
   git = {
     enable = true,
     command = "git",
@@ -63,8 +66,9 @@ local full_opts = {
       fg = "#000000"
     },
     PandaTreeSpecialFile = {
-      bg = "#FF0000",
-      fg = "#000000"
+      bg = "NONE",
+      fg = "#d19a66",
+      gui = "bold,italic,underline"
     }
   },
   icon = {
@@ -331,7 +335,10 @@ local function load_pandatree_theme()
       color_command = color_command .. "guibg=" .. v.bg .. " "
     end
     if v.fg ~= nil then
-      color_command = color_command .. "guifg=" .. v.fg
+      color_command = color_command .. "guifg=" .. v.fg .. " "
+    end
+    if v.gui ~= nil then
+      color_command = color_command .. "gui=" .. v.gui
     end
     vim.api.nvim_command(color_command)
   end
@@ -530,13 +537,18 @@ local function draw_tree()
         }
       )
     else
+      local group = "PandaTreeFile"
+      if not require "pl.path".isdir(v.path) and vim.tbl_contains(full_opts.special_files, v.name) then
+        group = "PandaTreeSpecialFile"
+      end
+      local col_start = #v.indent + #v.icon + 1
       table.insert(
         line_color,
         {
-          group = "PandaTreeFile",
+          group = group,
           line = k - 1,
-          col_start = #v.indent + #v.icon,
-          col_end = -1
+          col_start = col_start,
+          col_end = col_start + #v.name
         }
       )
     end

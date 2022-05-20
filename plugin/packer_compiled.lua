@@ -224,6 +224,11 @@ _G.packer_plugins = {
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/vim-easymotion",
     url = "https://github.com/easymotion/vim-easymotion"
   },
+  ["vim-illuminate"] = {
+    loaded = true,
+    path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/vim-illuminate",
+    url = "https://github.com/RRethy/vim-illuminate"
+  },
   ["vim-startify"] = {
     loaded = true,
     path = "/Users/xiaogao/.local/share/nvim/site/pack/packer/start/vim-startify",

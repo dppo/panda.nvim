@@ -50,7 +50,7 @@ require("scrollview").setup(
 
 -- startify
 vim.g.startify_change_to_dir = 0
-vim.g.startify_change_to_vcs_root = 1
+vim.g.startify_change_to_vcs_root = 0
 
 -- treesitter
 require "nvim-treesitter.configs".setup {
