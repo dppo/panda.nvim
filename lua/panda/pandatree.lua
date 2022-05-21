@@ -763,6 +763,7 @@ end
 local function win_check_auto_close()
   local not_tree_wins = tabpage_list_not_tree_wins()
   if vim.tbl_count(not_tree_wins) == 0 then
+    -- TODO 检测buffer是否保存
     vim.api.nvim_command("q")
   end
 end

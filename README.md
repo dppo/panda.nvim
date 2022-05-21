@@ -10,5 +10,5 @@
 9. ~~tree文件夹git状态优化，显示暂存状态~~
 10. tree git状态添加颜色展示
 11. ~~添加DiffView~~
-12. tree不能继续搜索bug
+12. ~~tree不能继续搜索bug~~
 13. 高亮当前word
