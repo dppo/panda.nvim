@@ -183,6 +183,21 @@ require "diffview".setup {
   }
 }
 
+-- illuminate
+vim.api.nvim_create_autocmd(
+  "VimEnter",
+  {
+    group = vim.api.nvim_create_augroup("illuminate_group", {clear}),
+    callback = function()
+      vim.cmd [[hi illuminatedCurWord gui=underline,bold,italic,inverse]]
+      vim.cmd [[hi illuminatedWord gui=underline,bold,italic,inverse]]
+      vim.cmd [[hi LspReferenceText gui=underline,bold,italic,inverse]]
+      vim.cmd [[hi LspReferenceWrite gui=underline,bold,italic,inverse]]
+      vim.cmd [[hi LspReferenceRead gui=underline,bold,italic,inverse]]
+    end
+  }
+)
+
 require("format")
 require("notice")
 require("completion")

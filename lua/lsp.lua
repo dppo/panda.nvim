@@ -1,11 +1,12 @@
 local lspinstaller = require "nvim-lsp-installer"
 local lspconfig = require("lspconfig")
 
-local on_attach = function(_, bufnr)
+local on_attach = function(client, bufnr)
   local opts = {buffer = bufnr, noremap = true, silent = true}
   vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
   vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
   vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+  require "illuminate".on_attach(client)
 end
 
 local capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())

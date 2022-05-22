@@ -78,6 +78,15 @@ vim.keymap.set("n", "<leader>tt", "<cmd>ToggleTerm<CR>", {silent = false, norema
 vim.keymap.set("n", "<leader>dv", "<cmd>DiffviewOpen<CR>", {silent = false, noremap = true})
 vim.keymap.set("n", "<leader>dh", "<cmd>DiffviewFileHistory<CR>", {silent = false, noremap = true})
 
+-- illuminate
+vim.keymap.set("n", "<c-n>", '<cmd>lua require"illuminate".next_reference{wrap=true}<cr>', {noremap = true})
+vim.keymap.set(
+  "n",
+  "<c-p>",
+  '<cmd>lua require"illuminate".next_reference{reverse=true,wrap=true}<cr>',
+  {noremap = true}
+)
+
 -- copy to system clipboard
 vim.keymap.set(
   "n",

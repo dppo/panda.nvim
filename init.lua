@@ -67,6 +67,7 @@ require("packer").startup {
       "sindrets/diffview.nvim",
       requires = "nvim-lua/plenary.nvim"
     }
+    use "Massolari/vim-illuminate"
 
     use_rocks {"luafilesystem", "luautf8", "penlight"}
   end,
