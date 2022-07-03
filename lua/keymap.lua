@@ -119,3 +119,17 @@ vim.keymap.set(
     noremap = true
   }
 )
+
+-- 当前buffer文件路径
+vim.keymap.set(
+  "n",
+  "<leader>i",
+  function()
+    vim.pretty_print(vim.api.nvim_buf_get_name(0))
+  end,
+  {
+    nowait = true,
+    silent = true,
+    noremap = true
+  }
+)
